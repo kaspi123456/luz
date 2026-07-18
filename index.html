@@ -146,7 +146,7 @@
 
 <header class="top">
   <h1>הלוז של הבולדוג</h1>
-  <span class="sub">היום <b id="cur-date">—</b> · תוכן הסידור עודכן: <span id="content-ver">שבת 18.7</span> · מתוך "סידור בקרים"</span>
+  <span class="sub">היום <b id="cur-date">—</b> · תוכן הסידור עודכן: <span id="content-ver">שבת 18.7 ✓</span> · מתוך "סידור בקרים"</span>
 </header>
 
 <div class="legend">
@@ -341,7 +341,7 @@
     [].slice.call(d.querySelectorAll('.ev')).forEach(function(ev){
       if(ev.classList.contains('proposed'))return;
       var tEl=ev.querySelector('.t'); if(!tEl)return;
-      var m=tEl.textContent.match(/(\d{1,2}:\d{2})\u2013(\d{1,2}:\d{2})/); if(!m)return;
+      var m=tEl.textContent.match(/(\d{1,2}:\d{2})–(\d{1,2}:\d{2})/); if(!m)return;
       var dnEl=d.querySelector('.dn');
       all.push({ev:ev,tEl:tEl,date:d.dataset.date,dn:dnEl?dnEl.textContent:'',s:mins(m[1]),e:mins(m[2])});
     });
@@ -420,7 +420,7 @@
   var secs=document.querySelectorAll('section.week');
   for(var i=0;i<secs.length;i++){
     var sec=secs[i]; if(!sec.querySelector('.days')) continue;
-    var name=sec.querySelector('h2').textContent.split('\u00b7')[0].trim();
+    var name=sec.querySelector('h2').textContent.split('·')[0].trim();
     var totals={}, prop={}; CATS.forEach(function(c){totals[c[0]]=0;prop[c[0]]=0});
     var nights=0;
     var ds=[].slice.call(sec.querySelectorAll('.day[data-date]')).map(function(d){return d.getAttribute('data-date')}).sort();
@@ -429,7 +429,7 @@
       var cat=null; CATS.forEach(function(c){ if(st.indexOf(c[0])>-1) cat=c[0]; });
       if(!cat) return;
       var tEl=ev.querySelector('.t'); if(!tEl) return;
-      var m=tEl.textContent.match(/(\d{1,2}:\d{2})\u2013(\d{1,2}:\d{2})/); if(!m) return;
+      var m=tEl.textContent.match(/(\d{1,2}:\d{2})–(\d{1,2}:\d{2})/); if(!m) return;
       var s=mins(m[1]),e=mins(m[2]); var d=e>s? e-s : e+1440-s;
       if(cat==='--shift' && s===0) nights++;
       if(ev.classList.contains('proposed')) prop[cat]+=d; else totals[cat]+=d;
@@ -454,25 +454,25 @@
   if(bars && max>0){
     var html='';
     weeks.forEach(function(w,wi){
-      html+='<div class="bar-row" data-week="'+wi+'"><span class="bl">'+w.name+(wi===cwi?' \u2b50':'')+'</span><div class="bar-track">';
+      html+='<div class="bar-row" data-week="'+wi+'"><span class="bl">'+w.name+(wi===cwi?' ⭐':'')+'</span><div class="bar-track">';
       CATS.forEach(function(c){
         var v=w.totals[c[0]], p=w.prop[c[0]];
         if(v>0) html+='<div class="bar-seg" style="width:'+(v/max*100)+'%;background:'+c[2]+'"></div>';
         if(p>0) html+='<div class="bar-seg prop" style="width:'+(p/max*100)+'%;background:'+c[2]+'"></div>';
       });
-      html+='</div><span class="bt">'+h(w.total)+' ש\u05f3</span></div>';
+      html+='</div><span class="bt">'+h(w.total)+' ש׳</span></div>';
     });
-    html+='<div id="stat-note">'+allNights+' משמרות לילה על הלוח · סה\u0022כ '+h(shiftAll)+' שעות משמרת · המקווקו = מוצע, מחכה לאישור · \u2b50 = השבוע הנוכחי</div>';
+    html+='<div id="stat-note">'+allNights+' משמרות לילה על הלוח · סה"כ '+h(shiftAll)+' שעות משמרת · המקווקו = מוצע, מחכה לאישור · ⭐ = השבוע הנוכחי</div>';
     bars.innerHTML=html;
   }
   var tip=document.createElement('div'); tip.id='viz-tip'; document.body.appendChild(tip);
   function tipHtml(wi){
     var w=weeks[wi]; if(!w) return '';
-    var out='<b>'+w.name+' · סה\u0022כ '+h(w.total)+' שעות</b><br>';
+    var out='<b>'+w.name+' · סה"כ '+h(w.total)+' שעות</b><br>';
     CATS.forEach(function(c){
       var v=w.totals[c[0]], p=w.prop[c[0]];
       if(v>0||p>0){
-        out+='<span class="tip-dot" style="background:'+c[2]+'"></span>'+c[1]+' · '+h(v+p)+' ש\u05f3';
+        out+='<span class="tip-dot" style="background:'+c[2]+'"></span>'+c[1]+' · '+h(v+p)+' ש׳';
         if(p>0) out+=' <span style="opacity:.75">(מזה '+h(p)+' מוצע)</span>';
         out+='<br>';
       }
