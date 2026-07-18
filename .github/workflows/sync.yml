@@ -1,0 +1,42 @@
+name: sync-luz-from-drive
+on:
+  schedule:
+    - cron: '23 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: fetch newest dashboard from Drive
+        run: |
+          python3 - <<'EOF'
+          import re, urllib.request
+          FOLDER = "1VQaNDdcAJj3Bd5s1yJQdrMG9OL1Y33k4"
+          url = "https://drive.google.com/embeddedfolderview?id=" + FOLDER + "#list"
+          html = urllib.request.urlopen(url).read().decode("utf-8", "ignore")
+          pairs = re.findall(r'id="entry-([\w-]+)".*?flip-entry-title">([^<]+)<', html, re.S)
+          cands = sorted([p for p in pairs if p[1].startswith("luz-") and p[1].endswith(".html")], key=lambda x: x[1])
+          if not cands:
+              print("no luz files yet"); raise SystemExit(0)
+          fid, name = cands[-1]
+          data = urllib.request.urlopen("https://drive.google.com/uc?export=download&id=" + fid).read()
+          if "\u05d4\u05dc\u05d5\u05d6 \u05e9\u05dc \u05d4\u05d1\u05d5\u05dc\u05d3\u05d5\u05d2".encode() not in data:
+              raise SystemExit("sanity check failed")
+          open("candidate.html", "wb").write(data)
+          open("newest_name.txt", "w").write(name)
+          EOF
+      - name: commit if changed
+        run: |
+          if [ -f candidate.html ] && ! cmp -s candidate.html index.html; then
+            mv candidate.html index.html
+            git config user.name "luz-bot"
+            git config user.email "actions@users.noreply.github.com"
+            git add index.html
+            git commit -m "sync: $(cat newest_name.txt)"
+            git push
+          else
+            echo "no change"
+          fi
