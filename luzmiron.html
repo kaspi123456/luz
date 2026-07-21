@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f1eadb">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="לוז">
+<title>הלוז של הבולדוג</title>
+<link rel="icon" type="image/png" href="kaspion.png">
+<link rel="apple-touch-icon" href="kaspion.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    color-scheme:light;
+    --page:#f1eadb;
+    --card:#fbf8f0;
+    --ink:#221d12; --ink-2:#5a523f; --muted:#8a8168;
+    --grid:#e0d7c2; --border:rgba(80,64,30,.16);
+    --shift:#1c8a3e;    /* משמרת — ירוק כמו באקסל */
+    --sleep:#5744c0;    /* שינה — סגול */
+    --workout:#2168cc;  /* אימון — כחול */
+    --self:#d43f7e;     /* זמן עצמי — ורוד */
+    --after:#0e7490;    /* אפטר — טורקיז */
+    --hearing:#d9480f;  /* דיון — כתום */
+    --meal:#a16207;     /* ארוחה — ענבר */
+    --life:#9333ea;     /* אירוע אישי */
+    --hot:#f2b705;      /* עכשיו / הבא בתור — צהוב */
+  }
+  *{box-sizing:border-box}
+  body{margin:0}
+  .viz-root{
+    font-family:"Heebo",system-ui,-apple-system,"Segoe UI",sans-serif;
+    background:var(--page); color:var(--ink);
+    min-height:100vh; padding:26px 22px 44px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1120px;margin:0 auto}
+  header.top{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 14px;margin-bottom:6px}
+  h1{font-size:26px;font-weight:900;margin:0;letter-spacing:-.2px}
+  .sub{color:var(--ink-2);font-size:13px;font-weight:500}
+
+  .legend{display:flex;flex-wrap:wrap;gap:7px;margin:16px 0 22px}
+  .legend .key{font-size:12.5px;font-weight:700;color:#fff;background:var(--c);border-radius:999px;padding:4px 13px}
+  .legend .key.dk{color:#221d12}
+  .legend .key.prop{background:#fff;color:var(--c);border:2px dashed var(--c);padding:2px 11px}
+
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:12px;margin-bottom:30px}
+  .tile{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;border-top:5px solid var(--tc,var(--grid));box-shadow:0 1px 3px rgba(80,64,30,.06)}
+  .tile.hot{background:#fff6d6;border-color:#e5c96a}
+  a.tile-link{display:block;text-decoration:none;color:inherit;cursor:pointer;transition:box-shadow .12s}
+  a.tile-link:hover{box-shadow:0 4px 14px rgba(80,64,30,.18)}
+  a.tile-link .v{color:var(--workout)}
+  .tile .v{font-size:20px;font-weight:900;line-height:1.25}
+  .tile .k{font-size:12px;color:var(--muted);margin-top:3px;font-weight:500}
+
+  section.week{margin-bottom:36px}
+  .week-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .week-head h2{font-size:18px;margin:0;font-weight:900}
+  .week-head .rule{flex:1;height:1px;background:var(--grid)}
+  .tag{font-size:12px;border:1.5px solid var(--border);border-radius:999px;padding:3px 12px;color:var(--ink-2);background:var(--card);font-weight:700;white-space:nowrap}
+  .tag.now{border-color:var(--shift);color:#fff;background:var(--shift)}
+
+  .days{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+  @media(max-width:900px){.days{grid-template-columns:repeat(4,1fr)}}
+  @media(max-width:580px){.days{grid-template-columns:repeat(2,1fr)}}
+  .day{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:10px;min-height:112px;display:flex;flex-direction:column;gap:7px;box-shadow:0 1px 3px rgba(80,64,30,.05)}
+  .day.today{border:3px solid #8a6a1f;background:#fdf4dd;box-shadow:0 4px 16px rgba(138,106,31,.30)}
+  .day.today .dh{border-bottom-color:#e3cf9a}
+  .day.past{opacity:.45}
+  .dh{display:flex;align-items:baseline;justify-content:space-between;border-bottom:1.5px solid var(--grid);padding-bottom:6px}
+  .dh .dn{font-size:13.5px;font-weight:900}
+  .dh .dd{font-size:11.5px;color:var(--muted);font-weight:500}
+  .badge{font-size:10.5px;font-weight:900;color:#fff;background:#8a6a1f;border-radius:999px;padding:2px 8px}
+
+  .ev{border-inline-start:5px solid var(--c);background:color-mix(in srgb,var(--c) 13%, #fffdf6);
+      border-radius:10px;padding:7px 9px;font-size:12.5px;line-height:1.5;position:relative}
+  .ev:hover{box-shadow:0 3px 10px rgba(80,64,30,.16)}
+  .t{direction:ltr;unicode-bidi:isolate;display:inline-block}
+  .ev .t{font-weight:900;font-size:13px;font-variant-numeric:tabular-nums}
+  td[dir="ltr"]{text-align:right}
+  .tc{display:inline-block;font-size:10px;font-weight:900;border-radius:6px;padding:2px 8px;color:#fff;background:var(--c);margin-inline-end:6px;vertical-align:1.5px}
+  .ev .l{color:var(--ink-2);font-size:11px;font-weight:500;display:block;margin-top:1px}
+  .ev.proposed{border:2px dashed var(--c);border-inline-start:5px solid var(--c);
+      background:repeating-linear-gradient(45deg, transparent 0 8px, color-mix(in srgb,var(--c) 8%, transparent) 8px 16px), #fffdf6}
+  .chip{display:inline-block;font-size:10px;font-weight:900;color:var(--c);border:1.5px dashed var(--c);border-radius:999px;padding:0 7px;margin-inline-start:5px;background:#fff;vertical-align:1px}
+  .hot-chip{display:inline-block;font-size:10px;font-weight:900;color:#221d12;background:var(--hot);border-radius:999px;padding:1px 8px;margin-inline-start:5px;vertical-align:1px}
+  .ev.live,.ev.next{outline:3px solid var(--hot);outline-offset:1px;background:#fff3c4;box-shadow:0 3px 12px rgba(242,183,5,.35)}
+  .free{color:var(--muted);font-size:12px;text-align:center;margin:auto 0;font-weight:500}
+  .note{font-size:11px;color:var(--ink-2);background:#f0e9d8;border:1px solid var(--grid);border-radius:8px;padding:4px 8px;font-weight:500}
+  .tbd{color:var(--muted);font-size:12px;text-align:center;margin:auto 0;font-style:italic}
+
+  details.tbl{margin-top:30px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 16px}
+  details.tbl summary{cursor:pointer;font-size:13.5px;font-weight:700;color:var(--ink-2)}
+  table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12.5px}
+  th{text-align:right;color:var(--muted);font-weight:700;border-bottom:2px solid var(--grid);padding:7px 8px}
+  td{border-bottom:1px solid var(--grid);padding:7px 8px;font-variant-numeric:tabular-nums}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--c);margin-inline-end:7px;vertical-align:-1px}
+  .st-in{color:#0a7a0a;font-weight:900}
+  .st-prop{color:var(--muted);font-weight:700}
+  .bars{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+  .bar-row{display:flex;align-items:center;gap:12px}
+  .bar-row .bl{width:60px;font-size:12.5px;font-weight:900;flex-shrink:0}
+  .bar-track{flex:1;display:flex;height:24px;border-radius:8px;overflow:hidden;background:#efe8d6;gap:2px}
+  .bar-seg{height:100%;min-width:2px}
+  .bar-seg.prop{opacity:.55}
+  .bar-row .bt{width:56px;font-size:12px;font-weight:900;color:var(--ink-2);flex-shrink:0;text-align:left}
+  #stat-note{font-size:12px;color:var(--ink-2);font-weight:500;margin-top:2px}
+  .bar-row,.tile[data-week]{cursor:default}
+  #viz-tip{position:fixed;z-index:99;background:#221d12;color:#fff;border-radius:10px;padding:10px 14px;font-size:12.5px;line-height:1.8;pointer-events:none;box-shadow:0 6px 22px rgba(0,0,0,.35);display:none;max-width:250px;font-weight:500}
+  #viz-tip b{font-weight:900}
+  .tip-dot{display:inline-block;width:9px;height:9px;border-radius:2.5px;margin-inline-end:7px}
+  .ev{cursor:pointer}
+  .ev.has-note::before{content:'📝';position:absolute;bottom:3px;inset-inline-start:6px;font-size:10px;opacity:.85;line-height:1}
+  .ev-more{display:none;margin-top:7px;padding-top:7px;border-top:1px dashed var(--grid)}
+  .ev.open .ev-more{display:block}
+  .ev-details{font-size:11px;color:var(--ink-2);font-weight:500;white-space:pre-wrap;margin-bottom:6px;line-height:1.5}
+  .ev-note{width:100%;box-sizing:border-box;border:1px solid var(--border);border-radius:7px;padding:6px 8px;font-family:inherit;font-size:11.5px;background:#fffef8;color:var(--ink);resize:vertical;min-height:36px;direction:rtl}
+  .ev-note:focus{outline:2px solid var(--c);border-color:var(--c)}
+  .ev-hint{font-size:10px;color:var(--muted);margin-top:4px}
+  .edit-tip{font-size:11.5px;color:var(--ink-2);background:#f0e9d8;border:1px solid var(--grid);border-radius:8px;padding:6px 10px;margin:0 0 16px;font-weight:500}
+  footer{margin-top:24px;font-size:11.5px;color:var(--muted);line-height:1.8;font-weight:500}
+  @media(max-width:480px){
+    .viz-root{padding:16px 10px 30px}
+    h1{font-size:21px}
+    .sub{font-size:11.5px}
+    .legend{gap:5px}
+    .legend .key{font-size:11px;padding:3px 9px}
+    .tiles{grid-template-columns:1fr 1fr;gap:8px}
+    .tile{padding:10px 12px}
+    .tile .v{font-size:16px}
+    .tile .k{font-size:10.5px}
+    .days{grid-template-columns:1fr 1fr;gap:7px}
+    .day{min-height:88px;padding:7px}
+    .ev{font-size:11.5px;padding:6px 8px}
+    .ev .t{font-size:12px}
+    .tc{font-size:9px;padding:1.5px 6px}
+    .week-head h2{font-size:15.5px}
+    .tag{font-size:10.5px;padding:2px 8px}
+    .bar-row .bl{width:44px;font-size:11.5px}
+    .bar-row .bt{width:48px;font-size:11px}
+    .bar-track{height:30px}
+    table{font-size:11px}
+    th,td{padding:5px 4px}
+    #viz-tip{max-width:200px;font-size:12px}
+  }
+</style>
+</head>
+<body>
+<div class="viz-root">
+<div class="wrap">
+
+<header class="top">
+  <h1>הלוז של הבולדוג</h1>
+  <span class="sub">היום <b id="cur-date">—</b> · תוכן הסידור עודכן: <span id="content-ver">20.7 · לילה חמישי 23.7 + תרגיל רביעי 22.7</span> · מתוך "סידור בקרים"</span>
+</header>
+
+<div class="edit-tip">💡 טאץ' על כל בלוק פותח אותו — שם אפשר לכתוב הערה (נשמרת אצלך בטלפון) ולראות פרטים נוספים.</div>
+<div class="legend">
+  <span class="key" style="--c:var(--shift)">משמרת</span>
+  <span class="key" style="--c:var(--sleep)">שינה + התארגנות</span>
+  <span class="key" style="--c:var(--after)">אפטר</span>
+  <span class="key" style="--c:var(--meal)">ארוחה</span>
+  <span class="key prop" style="--c:var(--workout)">אימון — מוצע</span>
+  <span class="key" style="--c:var(--self)">זמן אישי</span>
+  <span class="key" style="--c:var(--hearing)">דיון</span>
+  <span class="key" style="--c:var(--life)">אישי</span>
+  <span class="key dk" style="--c:var(--hot)">עכשיו / הבא בתור</span>
+</div>
+
+<div class="tiles">
+  <div class="tile hot" style="--tc:var(--hot)"><div class="k">הבא בתור · מתעדכן לבד</div><div class="v" id="next-tile">שבת · משמרת <span class="t">08:00</span></div></div>
+  <div class="tile" style="--tc:var(--sleep)"><div class="k">השינה הבאה · מתעדכן לבד</div><div class="v" id="sleep-tile">לפי הלוח</div></div>
+  <div class="tile" style="--tc:var(--after)"><div class="k">היציאה הבאה הביתה</div><div class="v">חמישי · ~12:00</div></div>
+  <a class="tile tile-link" style="--tc:var(--workout)" href="https://claude.ai/code/session_01Q3ghzU3CUNUSbB6Mgqk1Vu" target="_blank" rel="noopener"><div class="k">עדכון בלוז? תכתוב לי</div><div class="v">פתיחת הצ'אט עם Claude ←</div></a>
+</div>
+
+<!-- ש.29 -->
+<section class="week">
+  <div class="week-head"><h2>ש.29 · 12–18 ביולי</h2><span class="tag">שבוע שעבר</span><span class="rule"></span></div>
+  <div class="days">
+    <div class="day past" data-date="2026-07-12"><div class="dh"><span class="dn">ראשון</span><span class="dd">12.7</span></div><div class="free">פנוי</div></div>
+    <div class="day past" data-date="2026-07-13"><div class="dh"><span class="dn">שני</span><span class="dd">13.7</span></div><div class="free">פנוי</div></div>
+    <div class="day past" data-date="2026-07-14"><div class="dh"><span class="dn">שלישי</span><span class="dd">14.7</span></div>
+      <div class="ev" style="--c:var(--shift)"><span class="tc">משמרת</span><span class="t">00:00–04:00</span></div></div>
+    <div class="day past" data-date="2026-07-15"><div class="dh"><span class="dn">רביעי</span><span class="dd">15.7</span></div>
+      <div class="ev" style="--c:var(--shift)"><span class="tc">משמרת</span><span class="t">20:00–00:00</span></div></div>
+    <div class="day past" data-date="2026-07-16"><div class="dh"><span class="dn">חמישי</span><span class="dd">16.7</span></div>
+      <div class="ev" style="--c:var(--shift)"><span class="tc">משמרת</span><span class="t">08:00–12:00</span></div>
+      <div class="ev" style="--c:var(--shift)"><span class="tc">משמרת</span><span class="t">20:00–00:00</span></div></div>
+    <div class="day today" data-date="2026-07-17"><div class="dh"><span class="dn">שישי</span><span class="dd">17.7</span><span class="badge">היום</span></div>
+      <div class="ev" style="--c:var(--shift);opacity:.45"><span class="tc">משמרת</span><span class="t">00:00–02:00</span></div>
+      <div class="ev" style="--c:var(--shift)"><span class="tc">משמרת</span><span class="t">12:00–16:00</span></div>
+      <div class="ev" style="--c:var(--self)"><span class="tc">זמן אישי</span><span class="t">16:00–19:45</span></div>
+      <div class="ev" style="--c:var(--meal)"><span class="tc">ארוחה</span><span class="t">20:00–22:00</span><span class="l">ארוחת ערב</span></div>
+      <div class="ev" style="--c:var(--sleep)" title="במיטה 23:30, השכמה 07:40"><span class="tc">שינה</span><span class="t">23:30–07:40</span><span class="l">לפני משמרת הבוקר</span></div></div>
+    <div class="day" data-date="2026-07-18"><div class="dh"><span class="dn">שבת</span><span class="dd">18.7</span></div>
+      <div class="ev" style="--c:var(--sleep)"><span class="tc">התארגנות</span><span class="t">07:40–08:00</span></div>
+      <div class="ev" style="--c:var(--shift)"><span class="tc">משמרת</span><span class="t">08:00–12:00</span></div>
+      <div class="ev" style="--c:var(--self)"><span class="tc">זמן אישי</span><span class="t">12:00–14:00</span></div>
+      <div class="ev" style="--c:var(--sleep)" title="מנוחה לפני הכפולה"><span class="tc">שנ"צ</span><span class="t">14:00–16:00</span></div>
+      <div class="ev" style="--c:var(--self)"><span class="tc">זמן אישי</span><span class="t">16:00–19:45</span></div>
+      <div class="ev" style="--c:var(--shift)"><span class="tc">כפולה</span><span class="t">20:00–04:00</span><span class="l">עד ראשון בבוקר</span></div></div>
+  </div>
+</section>
+
+<!-- ש.30 -->
+<section class="week">
+  <div class="week-head"><h2>ש.30 · 19–25 ביולי</h2><span class="tag now">השבוע</span><span class="rule"></span></div>
+  <div class="days">
+    <div class="day" data-date="2026-07-19"><div class="dh"><span class="dn">ראשון</span><span class="dd">19.7</span></div>
+      <div class="ev" style="--c:var(--shift)"><span class="tc">כפולה</span><span class="t">עד 04:00</span></div>
+      <div class="ev" style="--c:var(--sleep)" title="7 שעות התאוששות אחרי הכפולה"><span class="tc">שינה</span><span class="t">04:30–11:30</span></div>
+      <div class="ev" style="--c:var(--meal)"><span class="tc">ארוחה</span><span class="t">11:30–12:30</span></div>
+      <div class="note">חופש · בערב גמר המונדיאל</div></div>
+    <div class="day" data-date="2026-07-20"><div class="dh"><span class="dn">שני</span><span class="dd">20.7</span></div>
+      <div class="ev" style="--c:var(--workout)"><span class="tc">אימון</span><span class="t">10:00–11:30</span><span class="l">בבסיס</span></div>
+      <div class="ev" style="--c:var(--meal)"><span class="tc">ארוחה</span><span class="t">11:30–12:30</span></div>
+      <div class="ev" style="--c:var(--self)"><span class="tc">זמן אישי</span><span class="t">13:00–15:15</span></div>
+      <div class="ev" style="--c:var(--hearing)"><span class="tc">דיון</span><span class="t">15:15–16:00</span><span class="l">שיחת פתיחה עם החיילים</span></div>
+      <div class="ev" style="--c:var(--shift)"><span class="tc">משמרת</span><span class="t">16:00–20:00</span></div>
+      <div class="ev" style="--c:var(--hearing);opacity:.55"><span class="tc">דיון</span><span class="t">16:30–17:00</span><span class="l">תחקיר · בזמן משמרת (לידיעה)</span></div>
+      <div class="ev" style="--c:var(--sleep)" title="מחר קמים ב-03:40"><span class="tc">שינה</span><span class="t">21:00–03:40</span><span class="l">מוקדם — מחר קמים ב-3:40</span></div></div>
+    <div class="day" data-date="2026-07-21"><div class="dh"><span class="dn">שלישי</span><span class="dd">21.7</span></div>
+      <div class="ev" style="--c:var(--sleep)"><span class="tc">התארגנות</span><span class="t">03:40–04:00</span></div>
+      <div class="ev" style="--c:var(--shift)"><span class="tc">משמרת</span><span class="t">04:00–08:00</span></div>
+      <div class="ev" style="--c:var(--sleep)" title="השלמה ל-7 שעות ביום עם שתי משמרות"><span class="tc">השלמה</span><span class="t">09:30–11:30</span></div>
+      <div class="ev" style="--c:var(--meal)"><span class="tc">ארוחה</span><span class="t">11:30–12:30</span></div>
+      <div class="ev" style="--c:var(--self)"><span class="tc">זמן אישי</span><span class="t">13:00–15:30</span></div>
+      <div class="ev" style="--c:var(--shift)"><span class="tc">משמרת</span><span class="t">16:00–20:00</span></div>
+      <div class="ev" style="--c:var(--sleep)"><span class="tc">שינה</span><span class="t">21:00–03:40</span></div></div>
+    <div class="day" data-date="2026-07-22"><div class="dh"><span class="dn">רביעי</span><span class="dd">22.7</span></div>
+      <div class="ev" style="--c:var(--sleep)"><span class="tc">התארגנות</span><span class="t">03:40–04:00</span></div>
+      <div class="ev" style="--c:var(--shift)" title="כולל תרגיל 08:00–09:00"><span class="tc">משמרת</span><span class="t">04:00–09:00</span><span class="l">כולל תרגיל 08:00–09:00</span></div>
+      <div class="ev" style="--c:var(--sleep)"><span class="tc">התאוששות</span><span class="t">09:30–13:00</span></div>
+      <div class="ev" style="--c:var(--self)"><span class="tc">זמן אישי</span><span class="t">13:00–19:00</span></div>
+      <div class="ev" style="--c:var(--sleep)" title="לפני משמרת הלילה"><span class="tc">שינה</span><span class="t">19:00–23:40</span><span class="l">לפני הלילה</span></div></div>
+    <div class="day" data-date="2026-07-23"><div class="dh"><span class="dn">חמישי</span><span class="dd">23.7</span></div>
+      <div class="ev" style="--c:var(--life)"><span class="tc">סרט</span><span class="t">23:30–03:00</span><span class="l">חמישי בלילה → שישי</span></div>
+      <div class="ev" style="--c:var(--shift)"><span class="tc">לילה</span><span class="t">00:00–04:00</span></div>
+      <div class="ev" style="--c:var(--sleep)" title="7 שעות אחרי הלילה"><span class="tc">התאוששות</span><span class="t">04:30–11:30</span></div>
+      <div class="ev" style="--c:var(--after)" title="המשמרת נגמרת לפני 16:00 — יוצאים ב-12:00"><span class="tc">אפטר</span><span class="t">12:00</span><span class="l">יציאה הביתה · עד סוף השבוע</span></div></div>
+    <div class="day" data-date="2026-07-24"><div class="dh"><span class="dn">שישי</span><span class="dd">24.7</span></div>
+      <div class="ev" style="--c:var(--life)"><span class="tc">בר מצווה</span><span class="t">10:00–14:00</span></div>
+      <div class="note">בבית — אפטר</div><div class="free">פנוי</div></div>
+    <div class="day" data-date="2026-07-25"><div class="dh"><span class="dn">שבת</span><span class="dd">25.7</span></div>
+      <div class="note">בבית — אפטר</div>
+      <div class="ev proposed" style="--c:var(--workout)"><span class="tc">אימון</span><span class="t">10:00–11:30</span><span class="chip">אופציונלי</span><span class="l">בבית — רק אם בא לך</span></div></div>
+  </div>
+</section>
+
+<!-- ש.31 -->
+<section class="week">
+  <div class="week-head"><h2>ש.31 · 26 ביולי – 1 באוגוסט</h2><span class="tag">סידור חלקי — מתעדכן</span><span class="rule"></span></div>
+  <div class="days">
+    <div class="day" data-date="2026-07-26"><div class="dh"><span class="dn">ראשון</span><span class="dd">26.7</span></div>
+      <div class="ev" style="--c:var(--meal)"><span class="tc">ארוחה</span><span class="t">11:30–12:00</span><span class="l">מקוצר — משמרת ב-12:00</span></div>
+      <div class="ev" style="--c:var(--shift)"><span class="tc">משמרת</span><span class="t">12:00–16:00</span></div></div>
+    <div class="day" data-date="2026-07-27"><div class="dh"><span class="dn">שני</span><span class="dd">27.7</span></div>
+      <div class="ev" style="--c:var(--shift)"><span class="tc">לילה</span><span class="t">00:00–04:00</span></div>
+      <div class="ev" style="--c:var(--meal)"><span class="tc">ארוחה</span><span class="t">11:30–12:30</span></div></div>
+    <div class="day" data-date="2026-07-28"><div class="dh"><span class="dn">שלישי</span><span class="dd">28.7</span></div>
+      <div class="ev" style="--c:var(--shift)"><span class="tc">לילה</span><span class="t">00:00–04:00</span></div>
+      <div class="ev" style="--c:var(--meal)"><span class="tc">ארוחה</span><span class="t">11:30–12:30</span></div></div>
+    <div class="day" data-date="2026-07-29"><div class="dh"><span class="dn">רביעי</span><span class="dd">29.7</span></div>
+      <div class="ev" style="--c:var(--meal)"><span class="tc">ארוחה</span><span class="t">11:30–12:30</span></div>
+      <div class="tbd">טרם שובץ</div></div>
+    <div class="day" data-date="2026-07-30"><div class="dh"><span class="dn">חמישי</span><span class="dd">30.7</span></div>
+      <div class="ev" style="--c:var(--meal)"><span class="tc">ארוחה</span><span class="t">11:30–12:30</span></div>
+      <div class="tbd">טרם שובץ</div></div>
+    <div class="day" data-date="2026-07-31"><div class="dh"><span class="dn">שישי</span><span class="dd">31.7</span></div>
+      <div class="ev" style="--c:var(--meal)"><span class="tc">ארוחה</span><span class="t">20:00–22:00</span><span class="l">ארוחת ערב</span></div>
+      <div class="tbd">טרם שובץ</div></div>
+    <div class="day" data-date="2026-08-01"><div class="dh"><span class="dn">שבת</span><span class="dd">1.8</span></div><div class="tbd">טרם שובץ</div></div>
+  </div>
+  <p style="font-size:12px;color:var(--muted);margin:10px 2px 0;font-weight:500">תכנון שינה לשבוע הזה יתווסף כשהסידור יתמלא · בהערות מופיע "מירון ודנה?" לשישי 31.7 — עוד לא סגור.</p>
+</section>
+
+<section class="week">
+  <div class="week-head"><h2>המספרים של הבולדוג</h2><span class="tag">חישוב שבועי · עמוד עם העכבר לפירוט</span><span class="rule"></span></div>
+  <div class="tiles" id="stat-tiles"></div>
+  <div class="bars" id="stat-bars"></div>
+</section>
+
+<details class="tbl">
+  <summary>תצוגת טבלה — כל האירועים</summary>
+  <table>
+    <thead><tr><th>תאריך</th><th>יום</th><th>שעות</th><th>סוג</th><th>סטטוס</th></tr></thead>
+    <tbody>
+      <tr><td>17.7</td><td>שישי</td><td dir="ltr">12:00–16:00</td><td><span class="dot" style="--c:var(--shift)"></span>משמרת</td><td class="st-in">ביומן ✓</td></tr>
+      <tr><td>17.7</td><td>שישי</td><td dir="ltr">16:00–19:45</td><td><span class="dot" style="--c:var(--self)"></span>זמן אישי</td><td class="st-in">ביומן ✓</td></tr>
+      <tr><td>17.7</td><td>שישי</td><td dir="ltr">23:30–07:40</td><td><span class="dot" style="--c:var(--sleep)"></span>שינה</td><td class="st-in">ביומן ✓</td></tr>
+      <tr><td>18.7</td><td>שבת</td><td dir="ltr">08:00–12:00</td><td><span class="dot" style="--c:var(--shift)"></span>משמרת</td><td class="st-in">ביומן ✓</td></tr>
+      <tr><td>18.7</td><td>שבת</td><td dir="ltr">12:00–14:00</td><td><span class="dot" style="--c:var(--self)"></span>זמן אישי</td><td class="st-in">ביומן ✓</td></tr>
+      <tr><td>18.7</td><td>שבת</td><td dir="ltr">14:00–16:00</td><td><span class="dot" style="--c:var(--sleep)"></span>שנ"צ</td><td class="st-in">ביומן ✓</td></tr>
+      <tr><td>18.7</td><td>שבת</td><td dir="ltr">16:00–19:45</td><td><span class="dot" style="--c:var(--self)"></span>זמן אישי</td><td class="st-in">ביומן ✓</td></tr>
+      <tr><td>18.7–19.7</td><td>שבת→ראשון</td><td dir="ltr">20:00–04:00</td><td><span class="dot" style="--c:var(--shift)"></span>משמרת כפולה</td><td class="st-in">ביומן ✓</td></tr>
+      <tr><td>19.7</td><td>ראשון</td><td dir="ltr">04:30–11:30</td><td><span class="dot" style="--c:var(--sleep)"></span>שינה — התאוששות</td><td class="st-in">ביומן ✓</td></tr>
+      <tr><td>20.7</td><td>שני</td><td dir="ltr">10:00–11:30</td><td><span class="dot" style="--c:var(--workout)"></span>אימון (בבסיס)</td><td class="st-prop">מוצע</td></tr>
+      <tr><td>20.7</td><td>שני</td><td dir="ltr">13:00–15:30</td><td><span class="dot" style="--c:var(--self)"></span>זמן אישי</td><td class="st-in">ביומן ✓</td></tr>
+      <tr><td>20.7</td><td>שני</td><td dir="ltr">16:00–20:00</td><td><span class="dot" style="--c:var(--shift)"></span>משמרת</td><td class="st-in">ביומן ✓</td></tr>
+      <tr><td>20.7–21.7</td><td>שני→שלישי</td><td dir="ltr">21:00–03:40</td><td><span class="dot" style="--c:var(--sleep)"></span>שינה</td><td class="st-in">ביומן ✓</td></tr>
+      <tr><td>21.7</td><td>שלישי</td><td dir="ltr">04:00–08:00</td><td><span class="dot" style="--c:var(--shift)"></span>משמרת</td><td class="st-in">ביומן ✓</td></tr>
+      <tr><td>21.7</td><td>שלישי</td><td dir="ltr">09:30–11:30</td><td><span class="dot" style="--c:var(--sleep)"></span>השלמת שינה</td><td class="st-in">ביומן ✓</td></tr>
+      <tr><td>21.7</td><td>שלישי</td><td dir="ltr">13:00–15:30</td><td><span class="dot" style="--c:var(--self)"></span>זמן אישי</td><td class="st-in">ביומן ✓</td></tr>
+      <tr><td>21.7</td><td>שלישי</td><td dir="ltr">16:00–20:00</td><td><span class="dot" style="--c:var(--shift)"></span>משמרת</td><td class="st-in">ביומן ✓</td></tr>
+      <tr><td>21.7–22.7</td><td>שלישי→רביעי</td><td dir="ltr">21:00–03:40</td><td><span class="dot" style="--c:var(--sleep)"></span>שינה</td><td class="st-in">ביומן ✓</td></tr>
+      <tr><td>22.7</td><td>רביעי</td><td dir="ltr">04:00–09:00</td><td><span class="dot" style="--c:var(--shift)"></span>משמרת + תרגיל</td><td class="st-in">ביומן ✓</td></tr>
+      <tr><td>22.7</td><td>רביעי</td><td dir="ltr">09:30–13:00</td><td><span class="dot" style="--c:var(--sleep)"></span>שינה — התאוששות</td><td class="st-in">ביומן ✓</td></tr>
+      <tr><td>22.7</td><td>רביעי</td><td dir="ltr">13:00–19:00</td><td><span class="dot" style="--c:var(--self)"></span>זמן אישי</td><td class="st-in">ביומן ✓</td></tr>
+      <tr><td>22.7</td><td>רביעי</td><td dir="ltr">19:00–23:40</td><td><span class="dot" style="--c:var(--sleep)"></span>שינה — לפני הלילה</td><td class="st-in">ביומן ✓</td></tr>
+      <tr><td>23.7</td><td>חמישי</td><td dir="ltr">00:00–04:00</td><td><span class="dot" style="--c:var(--shift)"></span>משמרת לילה</td><td class="st-in">ביומן ✓</td></tr>
+      <tr><td>23.7</td><td>חמישי</td><td dir="ltr">04:30–11:30</td><td><span class="dot" style="--c:var(--sleep)"></span>שינה — התאוששות</td><td class="st-in">ביומן ✓</td></tr>
+      <tr><td>23.7–25.7</td><td>חמישי–שבת</td><td dir="ltr">12:00 →</td><td><span class="dot" style="--c:var(--after)"></span>אפטר — בבית</td><td class="st-in">ביומן ✓</td></tr>
+      <tr><td>25.7</td><td>שבת</td><td dir="ltr">10:00–11:30</td><td><span class="dot" style="--c:var(--workout)"></span>אימון בבית</td><td class="st-prop">המלצה</td></tr>
+      <tr><td>26.7</td><td>ראשון</td><td dir="ltr">12:00–16:00</td><td><span class="dot" style="--c:var(--shift)"></span>משמרת</td><td class="st-in">ביומן ✓</td></tr>
+      <tr><td>27.7</td><td>שני</td><td dir="ltr">00:00–04:00</td><td><span class="dot" style="--c:var(--shift)"></span>משמרת לילה</td><td class="st-in">ביומן ✓</td></tr>
+      <tr><td>28.7</td><td>שלישי</td><td dir="ltr">00:00–04:00</td><td><span class="dot" style="--c:var(--shift)"></span>משמרת לילה</td><td class="st-in">ביומן ✓</td></tr>
+      <tr><td>א׳–ה׳ קבוע</td><td>—</td><td dir="ltr">11:30–12:30</td><td><span class="dot" style="--c:var(--meal)"></span>ארוחת צהריים · רק בבסיס</td><td class="st-in">ביומן ✓</td></tr>
+      <tr><td>שישי קבוע</td><td>—</td><td dir="ltr">20:00–22:00</td><td><span class="dot" style="--c:var(--meal)"></span>ארוחת ערב · רק בבסיס</td><td class="st-in">ביומן ✓</td></tr>
+    </tbody>
+  </table>
+</details>
+
+<footer>
+  ההדגשה של "היום", הימים שעברו והסימון הצהוב של עכשיו/הבא-בתור מתעדכנים לבד בכל פתיחה של הקובץ · תוכן חדש (משמרות, דיונים) נכנס כשאני מושך את הסידור מחדש.<br>
+  יעד שינה: 7 שעות · התארגנות = 20 הדקות שלפני המשמרת (למשל 03:40–04:00) · בימים עם שתי משמרות — שינה מוקדמת + השלמה.<br>
+  אימונים רק בזמן בסיס · כל חור פנוי בבסיס (כשאין חוב שינה) הופך לזמן אישי · אין ארוחות ואין זמן-עצמי ביומן כשאתה בבית.<br>
+  ארוחות בבסיס: צהריים 11:30–12:30 (א׳–ה׳), ערב שישי 20:00–22:00 · יציאות הביתה: אפטר ~12:00 · משמרת שנגמרת ב-16:00 — יציאה ב-16:00 · משמרת שנגמרת לפני 16:00 — יציאה ב-12:00 · חמישי רגיל ~12:00.<br>
+  תזכורות ביומן גוגל: שעה לפני משמרת · לילה/בוקר-מוקדם גם ב-21:00 בערב הקודם · "ללכת לישון" חצי שעה לפני.<br>
+  מקור: גיליון "סידור בקרים" (טאב בקר; מאוגוסט גם טאב מפקדת ירוט) · נבנה אוטומטית ע"י Claude.
+</footer>
+
+</div>
+</div>
+<script>
+(function(){
+  var now=new Date();
+  function pad(n){return (n<10?'0':'')+n}
+  var todayStr=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate());
+  var cd=document.getElementById('cur-date');
+  if(cd){var dnames=['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];cd.textContent='יום '+dnames[now.getDay()]+' '+now.getDate()+'.'+(now.getMonth()+1)+'.'+now.getFullYear();}
+  var days=[].slice.call(document.querySelectorAll('.day[data-date]'));
+  days.forEach(function(d){
+    d.classList.remove('today','past');
+    var b=d.querySelector('.badge'); if(b) b.remove();
+    var ds=d.getAttribute('data-date');
+    if(ds===todayStr){
+      d.classList.add('today');
+      var nb=document.createElement('span'); nb.className='badge'; nb.textContent='היום';
+      d.querySelector('.dh').appendChild(nb);
+    } else if(ds<todayStr){ d.classList.add('past'); }
+  });
+  [].slice.call(document.querySelectorAll('.hot-chip')).forEach(function(c){c.remove()});
+  [].slice.call(document.querySelectorAll('.ev.live,.ev.next')).forEach(function(e){e.classList.remove('live','next')});
+  function mins(s){var p=s.split(':');return (+p[0])*60+(+p[1])}
+  var cur=now.getHours()*60+now.getMinutes();
+  var all=[];
+  days.sort(function(a,b){return a.dataset.date<b.dataset.date?-1:1}).forEach(function(d){
+    [].slice.call(d.querySelectorAll('.ev')).forEach(function(ev){
+      if(ev.classList.contains('proposed'))return;
+      var tEl=ev.querySelector('.t'); if(!tEl)return;
+      var m=tEl.textContent.match(/(\d{1,2}:\d{2})–(\d{1,2}:\d{2})/); if(!m)return;
+      var dnEl=d.querySelector('.dn');
+      all.push({ev:ev,tEl:tEl,date:d.dataset.date,dn:dnEl?dnEl.textContent:'',s:mins(m[1]),e:mins(m[2])});
+    });
+  });
+  function mark(item,cls,txt){
+    item.ev.classList.add(cls);
+    var chip=document.createElement('span');chip.className='hot-chip';chip.textContent=txt;
+    item.tEl.insertAdjacentElement('afterend',chip);
+  }
+  // אירוע חי מהיום — אירוע חוצה-חצות נחשב "עכשיו" רק מרגע תחילתו בערב, לא בזנב הבוקר שלו
+  var live=null, liveIsYesterday=false, next=null;
+  for(var i=0;i<all.length;i++){
+    var it=all[i];
+    if(it.date!==todayStr) continue;
+    var isLive = it.e>it.s ? (cur>=it.s&&cur<it.e) : (cur>=it.s);
+    if(isLive){ live=it; break; }
+  }
+  // אם אין — זנב של אירוע חוצה-חצות מאתמול (שינה/כפולה שנמשכת אל תוך הבוקר)
+  if(!live){
+    var yd=new Date(now.getTime()-86400000);
+    var yts=yd.getFullYear()+'-'+pad(yd.getMonth()+1)+'-'+pad(yd.getDate());
+    for(var j=0;j<all.length;j++){
+      var y=all[j];
+      if(y.date===yts && y.e<y.s && cur<y.e){ live=y; liveIsYesterday=true; break; }
+    }
+  }
+  for(var k=0;k<all.length;k++){
+    var c=all[k];
+    if(c.date===todayStr && c.s>cur){ next=c; break; }
+    if(c.date>todayStr){ next=c; break; }
+  }
+  if(live && !liveIsYesterday){ mark(live,'live','עכשיו'); }
+  else if(next){ mark(next,'next','הבא בתור'); }
+  var tile=document.getElementById('next-tile');
+  function tileTxt(it,prefix){
+    var tc=it.ev.querySelector('.tc');
+    var name=tc?tc.textContent:'אירוע';
+    return prefix+' · '+name+' <span class="t">'+it.tEl.textContent+'</span>';
+  }
+  if(tile){
+    if(live) tile.innerHTML=tileTxt(live,'עכשיו');
+    else if(next) tile.innerHTML=tileTxt(next, next.date===todayStr?'היום':next.dn);
+  }
+  // כרטיס "השינה הבאה" — האירוע-שינה הרלוונטי הקרוב (לא התארגנות)
+  var st=document.getElementById('sleep-tile');
+  if(st){
+    var pick=null;
+    if(live && liveIsYesterday && (live.ev.getAttribute('style')||'').indexOf('--sleep')>-1){ pick=live; }
+    if(!pick){
+      for(var q=0;q<all.length;q++){
+        var itq=all[q];
+        if((itq.ev.getAttribute('style')||'').indexOf('--sleep')<0) continue;
+        var tcq=itq.ev.querySelector('.tc');
+        if(tcq && tcq.textContent==='התארגנות') continue;
+        var rel = itq.date>todayStr || (itq.date===todayStr && (itq.e<itq.s || cur<itq.e));
+        if(rel){ pick=itq; break; }
+      }
+    }
+    if(pick){
+      var lbl = (live===pick) ? 'עכשיו' : (pick.date===todayStr ? 'היום' : pick.dn);
+      var nm=(pick.ev.querySelector('.tc')||{textContent:'שינה'}).textContent;
+      st.innerHTML=lbl+' · '+nm+' <span class="t">'+pick.tEl.textContent+'</span>';
+    }
+  }
+})();
+</script>
+<script>
+(function(){
+  var CATS=[['--shift','משמרת','var(--shift)'],['--sleep','שינה','var(--sleep)'],['--workout','אימון','var(--workout)'],['--self','זמן אישי','var(--self)'],['--meal','ארוחה','var(--meal)']];
+  function mins(s){var p=s.split(':');return (+p[0])*60+(+p[1])}
+  function h(x){var v=x/60; return (Math.round(v*10)/10)+''}
+  function pad(n){return (n<10?'0':'')+n}
+  var now=new Date();
+  var todayStr=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate());
+  var weeks=[];
+  var secs=document.querySelectorAll('section.week');
+  for(var i=0;i<secs.length;i++){
+    var sec=secs[i]; if(!sec.querySelector('.days')) continue;
+    var name=sec.querySelector('h2').textContent.split('·')[0].trim();
+    var totals={}, prop={}; CATS.forEach(function(c){totals[c[0]]=0;prop[c[0]]=0});
+    var nights=0;
+    var ds=[].slice.call(sec.querySelectorAll('.day[data-date]')).map(function(d){return d.getAttribute('data-date')}).sort();
+    [].slice.call(sec.querySelectorAll('.ev')).forEach(function(ev){
+      var st=ev.getAttribute('style')||'';
+      var cat=null; CATS.forEach(function(c){ if(st.indexOf(c[0])>-1) cat=c[0]; });
+      if(!cat) return;
+      var tEl=ev.querySelector('.t'); if(!tEl) return;
+      var m=tEl.textContent.match(/(\d{1,2}:\d{2})–(\d{1,2}:\d{2})/); if(!m) return;
+      var s=mins(m[1]),e=mins(m[2]); var d=e>s? e-s : e+1440-s;
+      if(cat==='--shift' && (e>s ? s<480 : e>0)) nights++;
+      if(ev.classList.contains('proposed')) prop[cat]+=d; else totals[cat]+=d;
+    });
+    weeks.push({name:name,totals:totals,prop:prop,nights:nights,from:ds[0]||'',to:ds[ds.length-1]||''});
+  }
+  function catAll(w,c){return (w.totals[c]||0)+(w.prop[c]||0)}
+  var cwi=0;
+  for(var k=0;k<weeks.length;k++){ if(weeks[k].from<=todayStr && todayStr<=weeks[k].to){cwi=k;break} if(todayStr>weeks[k].to) cwi=Math.min(k+1,weeks.length-1); }
+  var cw=weeks[cwi]||{totals:{},prop:{},nights:0,name:''};
+  var allNights=0, shiftAll=0;
+  weeks.forEach(function(w){allNights+=w.nights; shiftAll+=(w.totals['--shift']||0)});
+  var tl=document.getElementById('stat-tiles');
+  if(tl) tl.innerHTML=
+    '<div class="tile" data-week="'+cwi+'" style="--tc:var(--shift)"><div class="k">משמרות · השבוע ('+cw.name+')</div><div class="v">'+h(cw.totals['--shift']||0)+' שעות</div></div>'+
+    '<div class="tile" data-week="'+cwi+'" style="--tc:var(--self)"><div class="k">זמן אישי · השבוע</div><div class="v">'+h(catAll(cw,'--self'))+' שעות</div></div>'+
+    '<div class="tile" data-week="'+cwi+'" style="--tc:var(--workout)"><div class="k">אימונים · השבוע</div><div class="v">'+h(catAll(cw,'--workout'))+' שעות</div></div>'+
+    '<div class="tile" data-week="'+cwi+'" style="--tc:var(--sleep)"><div class="k">משמרות לילה · השבוע</div><div class="v">'+cw.nights+'</div></div>';
+  var bars=document.getElementById('stat-bars');
+  var max=0;
+  weeks.forEach(function(w){var t=0;CATS.forEach(function(c){t+=catAll(w,c[0])});w.total=t;if(t>max)max=t});
+  if(bars && max>0){
+    var html='';
+    weeks.forEach(function(w,wi){
+      html+='<div class="bar-row" data-week="'+wi+'"><span class="bl">'+w.name+(wi===cwi?' ⭐':'')+'</span><div class="bar-track">';
+      CATS.forEach(function(c){
+        var v=w.totals[c[0]], p=w.prop[c[0]];
+        if(v>0) html+='<div class="bar-seg" style="width:'+(v/max*100)+'%;background:'+c[2]+'"></div>';
+        if(p>0) html+='<div class="bar-seg prop" style="width:'+(p/max*100)+'%;background:'+c[2]+'"></div>';
+      });
+      html+='</div><span class="bt">'+h(w.total)+' ש׳</span></div>';
+    });
+    html+='<div id="stat-note">'+allNights+' משמרות לילה על הלוח · סה"כ '+h(shiftAll)+' שעות משמרת · לילה = כל משמרת שנוגעת ב-00:00–08:00 · מקווקו = אופציונלי · ⭐ = השבוע הנוכחי</div>';
+    bars.innerHTML=html;
+  }
+  var tip=document.createElement('div'); tip.id='viz-tip'; document.body.appendChild(tip);
+  function tipHtml(wi){
+    var w=weeks[wi]; if(!w) return '';
+    var out='<b>'+w.name+' · סה"כ '+h(w.total)+' שעות</b><br>';
+    CATS.forEach(function(c){
+      var v=w.totals[c[0]], p=w.prop[c[0]];
+      if(v>0||p>0){
+        out+='<span class="tip-dot" style="background:'+c[2]+'"></span>'+c[1]+' · '+h(v+p)+' ש׳';
+        if(p>0) out+=' <span style="opacity:.75">(מזה '+h(p)+' אופציונלי)</span>';
+        out+='<br>';
+      }
+    });
+    if(w.nights>0) out+='<span style="opacity:.75">'+w.nights+' משמרות לילה</span>';
+    return out;
+  }
+  function show(e,wi){
+    tip.innerHTML=tipHtml(wi); tip.style.display='block';
+    var x=e.clientX, y=e.clientY;
+    var r=tip.getBoundingClientRect();
+    var left=Math.min(Math.max(8,x-r.width/2), window.innerWidth-r.width-8);
+    var top=y+18; if(top+r.height>window.innerHeight-8) top=y-r.height-14;
+    tip.style.left=left+'px'; tip.style.top=top+'px';
+  }
+  var tipOwner=null;
+  function bind(el){
+    var wi=+el.getAttribute('data-week');
+    el.addEventListener('mousemove',function(e){show(e,wi)});
+    el.addEventListener('mouseleave',function(){tip.style.display='none';tipOwner=null});
+    el.addEventListener('click',function(e){
+      e.stopPropagation();
+      if(tip.style.display==='block' && tipOwner===el){tip.style.display='none';tipOwner=null}
+      else {show(e,wi);tipOwner=el}
+    });
+  }
+  [].slice.call(document.querySelectorAll('.bar-row[data-week]')).forEach(bind);
+  document.addEventListener('click',function(){tip.style.display='none';tipOwner=null});
+})();
+</script>
+<script>
+(function(){
+  function store(k,v){ try{ if(v) localStorage.setItem(k,v); else localStorage.removeItem(k); }catch(e){} }
+  function fetchNote(k){ try{ return localStorage.getItem(k)||''; }catch(e){ return ''; } }
+  var evs=[].slice.call(document.querySelectorAll('.ev'));
+  evs.forEach(function(ev){
+    if(ev.dataset.wired) return; ev.dataset.wired='1';
+    var day=ev.closest('.day');
+    var d=day?day.getAttribute('data-date'):'x';
+    var tc=ev.querySelector('.tc'); var t=ev.querySelector('.t');
+    var key='luznote:'+d+'|'+(tc?tc.textContent:'')+'|'+(t?t.textContent:'');
+    var details=ev.getAttribute('title')||'';
+    var more=document.createElement('div'); more.className='ev-more';
+    if(details){ var dd=document.createElement('div'); dd.className='ev-details'; dd.textContent='ℹ️ '+details; more.appendChild(dd); }
+    var ta=document.createElement('textarea'); ta.className='ev-note'; ta.rows=2; ta.placeholder='הוסף הערה…';
+    ta.value=fetchNote(key);
+    ta.addEventListener('click',function(e){e.stopPropagation();});
+    ta.addEventListener('input',function(){ store(key, ta.value.trim()); ev.classList.toggle('has-note', !!ta.value.trim()); });
+    more.appendChild(ta);
+    var hint=document.createElement('div'); hint.className='ev-hint'; hint.textContent='נשמר אוטומטית · הערה נשמרת אצלך בטלפון';
+    more.appendChild(hint);
+    ev.appendChild(more);
+    if(ta.value.trim()) ev.classList.add('has-note');
+    ev.addEventListener('click',function(e){ if(e.target.closest('.ev-note')) return; ev.classList.toggle('open'); });
+  });
+})();
+</script>
+</body>
+</html>
