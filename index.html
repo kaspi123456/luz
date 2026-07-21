@@ -25,7 +25,7 @@
     --ink:#221d12; --ink-2:#5a523f; --muted:#8a8168;
     --grid:#e0d7c2; --border:rgba(80,64,30,.16);
     --shift:#1c8a3e;    /* משמרת — ירוק כמו באקסל */
-    --sleep:#5744c0;    /* שינה — סגול */
+    --sleep:#2f52b0;    /* שינה — אינדיגו/כחול לילה (נבדל מוורוד ומסגול) */
     --workout:#2168cc;  /* אימון — כחול */
     --self:#d43f7e;     /* זמן עצמי — ורוד */
     --after:#0e7490;    /* אפטר — טורקיז */
@@ -159,7 +159,7 @@
 
 <header class="top">
   <h1>הלוז של הבולדוג</h1>
-  <span class="sub">היום <b id="cur-date">—</b> · תוכן הסידור עודכן: <span id="content-ver">20.7 · לילה חמישי 23.7 + תרגיל רביעי 22.7</span> · מתוך "סידור בקרים"</span>
+  <span class="sub">היום <b id="cur-date">—</b> · תוכן הסידור עודכן: <span id="content-ver">21.7 · דיון סטטוס משימות 13:00 · תיקון הצגת הסרט</span> · מתוך "סידור בקרים"</span>
 </header>
 
 <div class="edit-tip">💡 טאץ' על כל בלוק פותח אותו — שם אפשר לכתוב הערה (נשמרת אצלך בטלפון) ולראות פרטים נוספים.</div>
@@ -233,7 +233,8 @@
       <div class="ev" style="--c:var(--shift)"><span class="tc">משמרת</span><span class="t">04:00–08:00</span></div>
       <div class="ev" style="--c:var(--sleep)" title="השלמה ל-7 שעות ביום עם שתי משמרות"><span class="tc">השלמה</span><span class="t">09:30–11:30</span></div>
       <div class="ev" style="--c:var(--meal)"><span class="tc">ארוחה</span><span class="t">11:30–12:30</span></div>
-      <div class="ev" style="--c:var(--self)"><span class="tc">זמן אישי</span><span class="t">13:00–15:30</span></div>
+      <div class="ev" style="--c:var(--hearing)"><span class="tc">דיון</span><span class="t">13:00–14:00</span><span class="l">סטטוס משימות</span></div>
+      <div class="ev" style="--c:var(--self)"><span class="tc">זמן אישי</span><span class="t">14:00–15:30</span></div>
       <div class="ev" style="--c:var(--shift)"><span class="tc">משמרת</span><span class="t">16:00–20:00</span></div>
       <div class="ev" style="--c:var(--sleep)"><span class="tc">שינה</span><span class="t">21:00–03:40</span></div></div>
     <div class="day" data-date="2026-07-22"><div class="dh"><span class="dn">רביעי</span><span class="dd">22.7</span></div>
@@ -243,10 +244,10 @@
       <div class="ev" style="--c:var(--self)"><span class="tc">זמן אישי</span><span class="t">13:00–19:00</span></div>
       <div class="ev" style="--c:var(--sleep)" title="לפני משמרת הלילה"><span class="tc">שינה</span><span class="t">19:00–23:40</span><span class="l">לפני הלילה</span></div></div>
     <div class="day" data-date="2026-07-23"><div class="dh"><span class="dn">חמישי</span><span class="dd">23.7</span></div>
-      <div class="ev" style="--c:var(--life)"><span class="tc">סרט</span><span class="t">23:30–03:00</span><span class="l">חמישי בלילה → שישי</span></div>
       <div class="ev" style="--c:var(--shift)"><span class="tc">לילה</span><span class="t">00:00–04:00</span></div>
       <div class="ev" style="--c:var(--sleep)" title="7 שעות אחרי הלילה"><span class="tc">התאוששות</span><span class="t">04:30–11:30</span></div>
-      <div class="ev" style="--c:var(--after)" title="המשמרת נגמרת לפני 16:00 — יוצאים ב-12:00"><span class="tc">אפטר</span><span class="t">12:00</span><span class="l">יציאה הביתה · עד סוף השבוע</span></div></div>
+      <div class="ev" style="--c:var(--after)" title="המשמרת נגמרת לפני 16:00 — יוצאים ב-12:00"><span class="tc">אפטר</span><span class="t">12:00</span><span class="l">יציאה הביתה · עד סוף השבוע</span></div>
+      <div class="ev" style="--c:var(--life)" title="מ-23:30 חמישי בלילה עד 03:00 שישי"><span class="tc">סרט</span><span class="t" style="direction:rtl">23:30–03:00</span><span class="l">חמישי בלילה → שישי</span></div></div>
     <div class="day" data-date="2026-07-24"><div class="dh"><span class="dn">שישי</span><span class="dd">24.7</span></div>
       <div class="ev" style="--c:var(--life)"><span class="tc">בר מצווה</span><span class="t">10:00–14:00</span></div>
       <div class="note">בבית — אפטר</div><div class="free">פנוי</div></div>
@@ -309,7 +310,8 @@
       <tr><td>20.7–21.7</td><td>שני→שלישי</td><td dir="ltr">21:00–03:40</td><td><span class="dot" style="--c:var(--sleep)"></span>שינה</td><td class="st-in">ביומן ✓</td></tr>
       <tr><td>21.7</td><td>שלישי</td><td dir="ltr">04:00–08:00</td><td><span class="dot" style="--c:var(--shift)"></span>משמרת</td><td class="st-in">ביומן ✓</td></tr>
       <tr><td>21.7</td><td>שלישי</td><td dir="ltr">09:30–11:30</td><td><span class="dot" style="--c:var(--sleep)"></span>השלמת שינה</td><td class="st-in">ביומן ✓</td></tr>
-      <tr><td>21.7</td><td>שלישי</td><td dir="ltr">13:00–15:30</td><td><span class="dot" style="--c:var(--self)"></span>זמן אישי</td><td class="st-in">ביומן ✓</td></tr>
+      <tr><td>21.7</td><td>שלישי</td><td dir="ltr">13:00–14:00</td><td><span class="dot" style="--c:var(--hearing)"></span>דיון · סטטוס משימות</td><td class="st-in">ביומן ✓</td></tr>
+      <tr><td>21.7</td><td>שלישי</td><td dir="ltr">14:00–15:30</td><td><span class="dot" style="--c:var(--self)"></span>זמן אישי</td><td class="st-in">ביומן ✓</td></tr>
       <tr><td>21.7</td><td>שלישי</td><td dir="ltr">16:00–20:00</td><td><span class="dot" style="--c:var(--shift)"></span>משמרת</td><td class="st-in">ביומן ✓</td></tr>
       <tr><td>21.7–22.7</td><td>שלישי→רביעי</td><td dir="ltr">21:00–03:40</td><td><span class="dot" style="--c:var(--sleep)"></span>שינה</td><td class="st-in">ביומן ✓</td></tr>
       <tr><td>22.7</td><td>רביעי</td><td dir="ltr">04:00–09:00</td><td><span class="dot" style="--c:var(--shift)"></span>משמרת + תרגיל</td><td class="st-in">ביומן ✓</td></tr>
@@ -436,7 +438,7 @@
 </script>
 <script>
 (function(){
-  var CATS=[['--shift','משמרת','var(--shift)'],['--sleep','שינה','var(--sleep)'],['--workout','אימון','var(--workout)'],['--self','זמן אישי','var(--self)'],['--meal','ארוחה','var(--meal)']];
+  var CATS=[['--shift','משמרת','var(--shift)'],['--sleep','שינה','var(--sleep)'],['--self','זמן אישי','var(--self)'],['--workout','אימון','var(--workout)'],['--meal','ארוחה','var(--meal)']];
   function mins(s){var p=s.split(':');return (+p[0])*60+(+p[1])}
   function h(x){var v=x/60; return (Math.round(v*10)/10)+''}
   function pad(n){return (n<10?'0':'')+n}
