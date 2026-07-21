@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#f1eadb">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -28,6 +31,7 @@
     --after:#0e7490;    /* אפטר — טורקיז */
     --hearing:#d9480f;  /* דיון — כתום */
     --meal:#a16207;     /* ארוחה — ענבר */
+    --life:#9333ea;     /* אירוע אישי */
     --hot:#f2b705;      /* עכשיו / הבא בתור — צהוב */
   }
   *{box-sizing:border-box}
@@ -113,6 +117,15 @@
   #viz-tip{position:fixed;z-index:99;background:#221d12;color:#fff;border-radius:10px;padding:10px 14px;font-size:12.5px;line-height:1.8;pointer-events:none;box-shadow:0 6px 22px rgba(0,0,0,.35);display:none;max-width:250px;font-weight:500}
   #viz-tip b{font-weight:900}
   .tip-dot{display:inline-block;width:9px;height:9px;border-radius:2.5px;margin-inline-end:7px}
+  .ev{cursor:pointer}
+  .ev.has-note::before{content:'📝';position:absolute;bottom:3px;inset-inline-start:6px;font-size:10px;opacity:.85;line-height:1}
+  .ev-more{display:none;margin-top:7px;padding-top:7px;border-top:1px dashed var(--grid)}
+  .ev.open .ev-more{display:block}
+  .ev-details{font-size:11px;color:var(--ink-2);font-weight:500;white-space:pre-wrap;margin-bottom:6px;line-height:1.5}
+  .ev-note{width:100%;box-sizing:border-box;border:1px solid var(--border);border-radius:7px;padding:6px 8px;font-family:inherit;font-size:11.5px;background:#fffef8;color:var(--ink);resize:vertical;min-height:36px;direction:rtl}
+  .ev-note:focus{outline:2px solid var(--c);border-color:var(--c)}
+  .ev-hint{font-size:10px;color:var(--muted);margin-top:4px}
+  .edit-tip{font-size:11.5px;color:var(--ink-2);background:#f0e9d8;border:1px solid var(--grid);border-radius:8px;padding:6px 10px;margin:0 0 16px;font-weight:500}
   footer{margin-top:24px;font-size:11.5px;color:var(--muted);line-height:1.8;font-weight:500}
   @media(max-width:480px){
     .viz-root{padding:16px 10px 30px}
@@ -149,6 +162,7 @@
   <span class="sub">היום <b id="cur-date">—</b> · תוכן הסידור עודכן: <span id="content-ver">20.7 · לילה חמישי 23.7 + תרגיל רביעי 22.7</span> · מתוך "סידור בקרים"</span>
 </header>
 
+<div class="edit-tip">💡 טאץ' על כל בלוק פותח אותו — שם אפשר לכתוב הערה (נשמרת אצלך בטלפון) ולראות פרטים נוספים.</div>
 <div class="legend">
   <span class="key" style="--c:var(--shift)">משמרת</span>
   <span class="key" style="--c:var(--sleep)">שינה + התארגנות</span>
@@ -157,6 +171,7 @@
   <span class="key prop" style="--c:var(--workout)">אימון — מוצע</span>
   <span class="key" style="--c:var(--self)">זמן אישי</span>
   <span class="key" style="--c:var(--hearing)">דיון</span>
+  <span class="key" style="--c:var(--life)">אישי</span>
   <span class="key dk" style="--c:var(--hot)">עכשיו / הבא בתור</span>
 </div>
 
@@ -228,14 +243,16 @@
       <div class="ev" style="--c:var(--self)"><span class="tc">זמן אישי</span><span class="t">13:00–19:00</span></div>
       <div class="ev" style="--c:var(--sleep)" title="לפני משמרת הלילה"><span class="tc">שינה</span><span class="t">19:00–23:40</span><span class="l">לפני הלילה</span></div></div>
     <div class="day" data-date="2026-07-23"><div class="dh"><span class="dn">חמישי</span><span class="dd">23.7</span></div>
+      <div class="ev" style="--c:var(--life)"><span class="tc">סרט</span><span class="t">23:59–03:00</span></div>
       <div class="ev" style="--c:var(--shift)"><span class="tc">לילה</span><span class="t">00:00–04:00</span></div>
       <div class="ev" style="--c:var(--sleep)" title="7 שעות אחרי הלילה"><span class="tc">התאוששות</span><span class="t">04:30–11:30</span></div>
       <div class="ev" style="--c:var(--after)" title="המשמרת נגמרת לפני 16:00 — יוצאים ב-12:00"><span class="tc">אפטר</span><span class="t">12:00</span><span class="l">יציאה הביתה · עד סוף השבוע</span></div></div>
     <div class="day" data-date="2026-07-24"><div class="dh"><span class="dn">שישי</span><span class="dd">24.7</span></div>
+      <div class="ev" style="--c:var(--life)"><span class="tc">בר מצווה</span><span class="t">10:00–14:00</span></div>
       <div class="note">בבית — אפטר</div><div class="free">פנוי</div></div>
     <div class="day" data-date="2026-07-25"><div class="dh"><span class="dn">שבת</span><span class="dd">25.7</span></div>
       <div class="note">בבית — אפטר</div>
-      <div class="ev proposed" style="--c:var(--workout)"><span class="tc">אימון</span><span class="t">10:00–11:30</span><span class="chip">המלצה</span><span class="l">בבית — רק אם בא לך</span></div></div>
+      <div class="ev proposed" style="--c:var(--workout)"><span class="tc">אימון</span><span class="t">10:00–11:30</span><span class="chip">אופציונלי</span><span class="l">בבית — רק אם בא לך</span></div></div>
   </div>
 </section>
 
@@ -440,7 +457,7 @@
       var tEl=ev.querySelector('.t'); if(!tEl) return;
       var m=tEl.textContent.match(/(\d{1,2}:\d{2})–(\d{1,2}:\d{2})/); if(!m) return;
       var s=mins(m[1]),e=mins(m[2]); var d=e>s? e-s : e+1440-s;
-      if(cat==='--shift' && s===0) nights++;
+      if(cat==='--shift' && (e>s ? s<480 : e>0)) nights++;
       if(ev.classList.contains('proposed')) prop[cat]+=d; else totals[cat]+=d;
     });
     weeks.push({name:name,totals:totals,prop:prop,nights:nights,from:ds[0]||'',to:ds[ds.length-1]||''});
@@ -471,7 +488,7 @@
       });
       html+='</div><span class="bt">'+h(w.total)+' ש׳</span></div>';
     });
-    html+='<div id="stat-note">'+allNights+' משמרות לילה על הלוח · סה"כ '+h(shiftAll)+' שעות משמרת · המקווקו = מוצע, מחכה לאישור · ⭐ = השבוע הנוכחי</div>';
+    html+='<div id="stat-note">'+allNights+' משמרות לילה על הלוח · סה"כ '+h(shiftAll)+' שעות משמרת · לילה = כל משמרת שנוגעת ב-00:00–08:00 · מקווקו = אופציונלי · ⭐ = השבוע הנוכחי</div>';
     bars.innerHTML=html;
   }
   var tip=document.createElement('div'); tip.id='viz-tip'; document.body.appendChild(tip);
@@ -482,7 +499,7 @@
       var v=w.totals[c[0]], p=w.prop[c[0]];
       if(v>0||p>0){
         out+='<span class="tip-dot" style="background:'+c[2]+'"></span>'+c[1]+' · '+h(v+p)+' ש׳';
-        if(p>0) out+=' <span style="opacity:.75">(מזה '+h(p)+' מוצע)</span>';
+        if(p>0) out+=' <span style="opacity:.75">(מזה '+h(p)+' אופציונלי)</span>';
         out+='<br>';
       }
     });
@@ -510,6 +527,33 @@
   }
   [].slice.call(document.querySelectorAll('.bar-row[data-week]')).forEach(bind);
   document.addEventListener('click',function(){tip.style.display='none';tipOwner=null});
+})();
+</script>
+<script>
+(function(){
+  function store(k,v){ try{ if(v) localStorage.setItem(k,v); else localStorage.removeItem(k); }catch(e){} }
+  function fetchNote(k){ try{ return localStorage.getItem(k)||''; }catch(e){ return ''; } }
+  var evs=[].slice.call(document.querySelectorAll('.ev'));
+  evs.forEach(function(ev){
+    if(ev.dataset.wired) return; ev.dataset.wired='1';
+    var day=ev.closest('.day');
+    var d=day?day.getAttribute('data-date'):'x';
+    var tc=ev.querySelector('.tc'); var t=ev.querySelector('.t');
+    var key='luznote:'+d+'|'+(tc?tc.textContent:'')+'|'+(t?t.textContent:'');
+    var details=ev.getAttribute('title')||'';
+    var more=document.createElement('div'); more.className='ev-more';
+    if(details){ var dd=document.createElement('div'); dd.className='ev-details'; dd.textContent='ℹ️ '+details; more.appendChild(dd); }
+    var ta=document.createElement('textarea'); ta.className='ev-note'; ta.rows=2; ta.placeholder='הוסף הערה…';
+    ta.value=fetchNote(key);
+    ta.addEventListener('click',function(e){e.stopPropagation();});
+    ta.addEventListener('input',function(){ store(key, ta.value.trim()); ev.classList.toggle('has-note', !!ta.value.trim()); });
+    more.appendChild(ta);
+    var hint=document.createElement('div'); hint.className='ev-hint'; hint.textContent='נשמר אוטומטית · הערה נשמרת אצלך בטלפון';
+    more.appendChild(hint);
+    ev.appendChild(more);
+    if(ta.value.trim()) ev.classList.add('has-note');
+    ev.addEventListener('click',function(e){ if(e.target.closest('.ev-note')) return; ev.classList.toggle('open'); });
+  });
 })();
 </script>
 </body>
