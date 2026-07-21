@@ -2,558 +2,1143 @@
 <html dir="rtl" lang="he">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#f1eadb">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-<meta name="mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="לוז">
-<title>הלוז של הבולדוג</title>
-<link rel="icon" type="image/png" href="kaspion.png">
-<link rel="apple-touch-icon" href="kaspion.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;900&display=swap" rel="stylesheet">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="הבנק של כספיון">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f3f3f1">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0d0d0d">
+<title>הבנק של כספיון</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-192.png">
 <style>
+  /* ===== צבעים ומשטחים (בהיר/כהה) ===== */
   :root{
-    color-scheme:light;
-    --page:#f1eadb;
-    --card:#fbf8f0;
-    --ink:#221d12; --ink-2:#5a523f; --muted:#8a8168;
-    --grid:#e0d7c2; --border:rgba(80,64,30,.16);
-    --shift:#1c8a3e;    /* משמרת — ירוק כמו באקסל */
-    --sleep:#5744c0;    /* שינה — סגול */
-    --workout:#2168cc;  /* אימון — כחול */
-    --self:#d43f7e;     /* זמן עצמי — ורוד */
-    --after:#0e7490;    /* אפטר — טורקיז */
-    --hearing:#d9480f;  /* דיון — כתום */
-    --meal:#a16207;     /* ארוחה — ענבר */
-    --life:#9333ea;     /* אירוע אישי */
-    --hot:#f2b705;      /* עכשיו / הבא בתור — צהוב */
+    color-scheme: light;
+    --page:#f3f3f1; --surface:#fbfbfa;
+    --ink:#1c1c1a; --ink-2:#5f5e5a; --muted:#8f8d87;
+    --grid:#e3e2dd; --baseline:#c9c8c2; --ring:rgba(11,11,11,.08);
+    --inc:#3d8b3d;            /* סדרת הכנסות (מרוכך, עובר ולידציה) */
+    --exp:#4a7ab5;            /* סדרת הוצאות (מרוכך, עובר ולידציה) */
+    --exp-track:#dfe5ec;
+    --good-text:#006300; --bad-text:#d03b3b;
+    --accent:#52514e; --accent-ink:#ffffff;   /* אפור כהה לכפתורים ולניווט */
+    --nav-h:64px;
   }
-  *{box-sizing:border-box}
-  body{margin:0}
-  .viz-root{
-    font-family:"Heebo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  @media (prefers-color-scheme: dark){
+    :root:where(:not([data-theme="light"])){
+      color-scheme: dark;
+      --page:#0d0d0d; --surface:#1a1a19;
+      --ink:#f2f2ef; --ink-2:#c3c2b7; --muted:#8f8d87;
+      --grid:#2c2c2a; --baseline:#383835; --ring:rgba(255,255,255,.10);
+      --inc:#4f9b4f; --exp:#5e94d4; --exp-track:#26364a;
+      --good-text:#0ca30c; --bad-text:#e66767;
+      --accent:#b9b8b0; --accent-ink:#1a1a19;
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme: dark;
+    --page:#0d0d0d; --surface:#1a1a19;
+    --ink:#f2f2ef; --ink-2:#c3c2b7; --muted:#8f8d87;
+    --grid:#2c2c2a; --baseline:#383835; --ring:rgba(255,255,255,.10);
+    --inc:#4f9b4f; --exp:#5e94d4; --exp-track:#26364a;
+    --good-text:#0ca30c; --bad-text:#e66767;
+    --accent:#b9b8b0; --accent-ink:#1a1a19;
+  }
+
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+  html,body{margin:0; padding:0}
+  body{
     background:var(--page); color:var(--ink);
-    min-height:100vh; padding:26px 22px 44px;
-    -webkit-font-smoothing:antialiased;
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-size:15px; line-height:1.45;
+    padding-bottom:calc(var(--nav-h) + max(env(safe-area-inset-bottom,0px), 12px) + 20px);
   }
-  .wrap{max-width:1120px;margin:0 auto}
-  header.top{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 14px;margin-bottom:6px}
-  h1{font-size:26px;font-weight:900;margin:0;letter-spacing:-.2px}
-  .sub{color:var(--ink-2);font-size:13px;font-weight:500}
 
-  .legend{display:flex;flex-wrap:wrap;gap:7px;margin:16px 0 22px}
-  .legend .key{font-size:12.5px;font-weight:700;color:#fff;background:var(--c);border-radius:999px;padding:4px 13px}
-  .legend .key.dk{color:#221d12}
-  .legend .key.prop{background:#fff;color:var(--c);border:2px dashed var(--c);padding:2px 11px}
-
-  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:12px;margin-bottom:30px}
-  .tile{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;border-top:5px solid var(--tc,var(--grid));box-shadow:0 1px 3px rgba(80,64,30,.06)}
-  .tile.hot{background:#fff6d6;border-color:#e5c96a}
-  a.tile-link{display:block;text-decoration:none;color:inherit;cursor:pointer;transition:box-shadow .12s}
-  a.tile-link:hover{box-shadow:0 4px 14px rgba(80,64,30,.18)}
-  a.tile-link .v{color:var(--workout)}
-  .tile .v{font-size:20px;font-weight:900;line-height:1.25}
-  .tile .k{font-size:12px;color:var(--muted);margin-top:3px;font-weight:500}
-
-  section.week{margin-bottom:36px}
-  .week-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
-  .week-head h2{font-size:18px;margin:0;font-weight:900}
-  .week-head .rule{flex:1;height:1px;background:var(--grid)}
-  .tag{font-size:12px;border:1.5px solid var(--border);border-radius:999px;padding:3px 12px;color:var(--ink-2);background:var(--card);font-weight:700;white-space:nowrap}
-  .tag.now{border-color:var(--shift);color:#fff;background:var(--shift)}
-
-  .days{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
-  @media(max-width:900px){.days{grid-template-columns:repeat(4,1fr)}}
-  @media(max-width:580px){.days{grid-template-columns:repeat(2,1fr)}}
-  .day{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:10px;min-height:112px;display:flex;flex-direction:column;gap:7px;box-shadow:0 1px 3px rgba(80,64,30,.05)}
-  .day.today{border:3px solid #8a6a1f;background:#fdf4dd;box-shadow:0 4px 16px rgba(138,106,31,.30)}
-  .day.today .dh{border-bottom-color:#e3cf9a}
-  .day.past{opacity:.45}
-  .dh{display:flex;align-items:baseline;justify-content:space-between;border-bottom:1.5px solid var(--grid);padding-bottom:6px}
-  .dh .dn{font-size:13.5px;font-weight:900}
-  .dh .dd{font-size:11.5px;color:var(--muted);font-weight:500}
-  .badge{font-size:10.5px;font-weight:900;color:#fff;background:#8a6a1f;border-radius:999px;padding:2px 8px}
-
-  .ev{border-inline-start:5px solid var(--c);background:color-mix(in srgb,var(--c) 13%, #fffdf6);
-      border-radius:10px;padding:7px 9px;font-size:12.5px;line-height:1.5;position:relative}
-  .ev:hover{box-shadow:0 3px 10px rgba(80,64,30,.16)}
-  .t{direction:ltr;unicode-bidi:isolate;display:inline-block}
-  .ev .t{font-weight:900;font-size:13px;font-variant-numeric:tabular-nums}
-  td[dir="ltr"]{text-align:right}
-  .tc{display:inline-block;font-size:10px;font-weight:900;border-radius:6px;padding:2px 8px;color:#fff;background:var(--c);margin-inline-end:6px;vertical-align:1.5px}
-  .ev .l{color:var(--ink-2);font-size:11px;font-weight:500;display:block;margin-top:1px}
-  .ev.proposed{border:2px dashed var(--c);border-inline-start:5px solid var(--c);
-      background:repeating-linear-gradient(45deg, transparent 0 8px, color-mix(in srgb,var(--c) 8%, transparent) 8px 16px), #fffdf6}
-  .chip{display:inline-block;font-size:10px;font-weight:900;color:var(--c);border:1.5px dashed var(--c);border-radius:999px;padding:0 7px;margin-inline-start:5px;background:#fff;vertical-align:1px}
-  .hot-chip{display:inline-block;font-size:10px;font-weight:900;color:#221d12;background:var(--hot);border-radius:999px;padding:1px 8px;margin-inline-start:5px;vertical-align:1px}
-  .ev.live,.ev.next{outline:3px solid var(--hot);outline-offset:1px;background:#fff3c4;box-shadow:0 3px 12px rgba(242,183,5,.35)}
-  .free{color:var(--muted);font-size:12px;text-align:center;margin:auto 0;font-weight:500}
-  .note{font-size:11px;color:var(--ink-2);background:#f0e9d8;border:1px solid var(--grid);border-radius:8px;padding:4px 8px;font-weight:500}
-  .tbd{color:var(--muted);font-size:12px;text-align:center;margin:auto 0;font-style:italic}
-
-  details.tbl{margin-top:30px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 16px}
-  details.tbl summary{cursor:pointer;font-size:13.5px;font-weight:700;color:var(--ink-2)}
-  table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12.5px}
-  th{text-align:right;color:var(--muted);font-weight:700;border-bottom:2px solid var(--grid);padding:7px 8px}
-  td{border-bottom:1px solid var(--grid);padding:7px 8px;font-variant-numeric:tabular-nums}
-  .dot{display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--c);margin-inline-end:7px;vertical-align:-1px}
-  .st-in{color:#0a7a0a;font-weight:900}
-  .st-prop{color:var(--muted);font-weight:700}
-  .bars{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:12px}
-  .bar-row{display:flex;align-items:center;gap:12px}
-  .bar-row .bl{width:60px;font-size:12.5px;font-weight:900;flex-shrink:0}
-  .bar-track{flex:1;display:flex;height:24px;border-radius:8px;overflow:hidden;background:#efe8d6;gap:2px}
-  .bar-seg{height:100%;min-width:2px}
-  .bar-seg.prop{opacity:.55}
-  .bar-row .bt{width:56px;font-size:12px;font-weight:900;color:var(--ink-2);flex-shrink:0;text-align:left}
-  #stat-note{font-size:12px;color:var(--ink-2);font-weight:500;margin-top:2px}
-  .bar-row,.tile[data-week]{cursor:default}
-  #viz-tip{position:fixed;z-index:99;background:#221d12;color:#fff;border-radius:10px;padding:10px 14px;font-size:12.5px;line-height:1.8;pointer-events:none;box-shadow:0 6px 22px rgba(0,0,0,.35);display:none;max-width:250px;font-weight:500}
-  #viz-tip b{font-weight:900}
-  .tip-dot{display:inline-block;width:9px;height:9px;border-radius:2.5px;margin-inline-end:7px}
-  .ev{cursor:pointer}
-  .ev.has-note::before{content:'📝';position:absolute;bottom:3px;inset-inline-start:6px;font-size:10px;opacity:.85;line-height:1}
-  .ev-more{display:none;margin-top:7px;padding-top:7px;border-top:1px dashed var(--grid)}
-  .ev.open .ev-more{display:block}
-  .ev-details{font-size:11px;color:var(--ink-2);font-weight:500;white-space:pre-wrap;margin-bottom:6px;line-height:1.5}
-  .ev-note{width:100%;box-sizing:border-box;border:1px solid var(--border);border-radius:7px;padding:6px 8px;font-family:inherit;font-size:11.5px;background:#fffef8;color:var(--ink);resize:vertical;min-height:36px;direction:rtl}
-  .ev-note:focus{outline:2px solid var(--c);border-color:var(--c)}
-  .ev-hint{font-size:10px;color:var(--muted);margin-top:4px}
-  .edit-tip{font-size:11.5px;color:var(--ink-2);background:#f0e9d8;border:1px solid var(--grid);border-radius:8px;padding:6px 10px;margin:0 0 16px;font-weight:500}
-  footer{margin-top:24px;font-size:11.5px;color:var(--muted);line-height:1.8;font-weight:500}
-  @media(max-width:480px){
-    .viz-root{padding:16px 10px 30px}
-    h1{font-size:21px}
-    .sub{font-size:11.5px}
-    .legend{gap:5px}
-    .legend .key{font-size:11px;padding:3px 9px}
-    .tiles{grid-template-columns:1fr 1fr;gap:8px}
-    .tile{padding:10px 12px}
-    .tile .v{font-size:16px}
-    .tile .k{font-size:10.5px}
-    .days{grid-template-columns:1fr 1fr;gap:7px}
-    .day{min-height:88px;padding:7px}
-    .ev{font-size:11.5px;padding:6px 8px}
-    .ev .t{font-size:12px}
-    .tc{font-size:9px;padding:1.5px 6px}
-    .week-head h2{font-size:15.5px}
-    .tag{font-size:10.5px;padding:2px 8px}
-    .bar-row .bl{width:44px;font-size:11.5px}
-    .bar-row .bt{width:48px;font-size:11px}
-    .bar-track{height:30px}
-    table{font-size:11px}
-    th,td{padding:5px 4px}
-    #viz-tip{max-width:200px;font-size:12px}
+  /* ===== כותרת עליונה ===== */
+  header{
+    position:sticky; top:0; z-index:20;
+    background:var(--page); border-bottom:1px solid var(--grid);
+    padding:calc(14px + env(safe-area-inset-top, 0px)) 16px 10px;
   }
+  .brand{display:flex; align-items:center; justify-content:space-between}
+  .brand h1{font-size:17px; margin:0; font-weight:700; letter-spacing:.2px}
+  .iconbtn{
+    border:1px solid var(--grid); background:var(--surface); color:var(--ink-2);
+    width:40px; height:40px; border-radius:12px; display:grid; place-items:center;
+    font-size:17px; cursor:pointer;
+  }
+  .iconbtn:active{transform:scale(.95)}
+  .monthbar{display:flex; align-items:center; justify-content:center; gap:6px; margin-top:8px}
+  .monthbar button{
+    border:0; background:none; color:var(--ink-2); font-size:22px; cursor:pointer;
+    width:44px; height:40px; border-radius:10px;
+  }
+  .monthbar button:active{background:var(--surface)}
+  #monthLabel{font-weight:650; min-width:130px; text-align:center; font-size:15px}
+
+  main{padding:14px 16px 8px; max-width:560px; margin:0 auto}
+  .view{display:none}
+  .view.on{display:block}
+  .loading main, main.loading{opacity:.45; pointer-events:none; transition:opacity .15s}
+
+  /* ===== כרטיסים וטיילים ===== */
+  .card{
+    background:var(--surface); border:1px solid var(--ring); border-radius:16px;
+    padding:14px 16px; margin-bottom:12px;
+  }
+  .card h2{font-size:13px; font-weight:600; color:var(--ink-2); margin:0 0 10px}
+  .hero{ text-align:center; padding:18px 16px 14px }
+  .hero .lbl{font-size:13px; color:var(--ink-2)}
+  .hero .val{font-size:44px; font-weight:700; letter-spacing:-.5px; margin:2px 0 2px}
+  .hero .delta{font-size:13px; color:var(--muted)}
+  .hero .delta b{font-weight:650}
+  .delta .up{color:var(--good-text)} .delta .down{color:var(--bad-text)}
+  .tiles{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px}
+  .tile{background:var(--surface); border:1px solid var(--ring); border-radius:16px; padding:12px 14px}
+  .tile .lbl{font-size:12.5px; color:var(--ink-2); display:flex; align-items:center; gap:6px}
+  .dot{width:9px; height:9px; border-radius:50%; display:inline-block; flex:none}
+  .dot.inc{background:var(--inc)} .dot.exp{background:var(--exp)}
+  .tile .val{font-size:23px; font-weight:700; margin-top:3px}
+  .tile .sub{font-size:11.5px; color:var(--muted); margin-top:2px}
+
+  /* ===== רשימת קטגוריות (ברים) ===== */
+  .catcell{border-radius:12px; margin:0 -8px; padding:0 8px; transition:background .12s}
+  .catcell.open{background:var(--page)}
+  .catrow{display:flex; align-items:center; gap:9px; padding:8px 0; cursor:pointer; -webkit-user-select:none; user-select:none}
+  .catrow .nm{flex:0 0 112px; font-size:13px; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .catrow .bar{flex:1; height:10px; background:none; position:relative}
+  .catrow .bar i{
+    position:absolute; inset-block:0; inset-inline-start:0; display:block;
+    background:var(--exp); min-width:3px;
+    border-start-end-radius:4px; border-end-end-radius:4px; /* קצה הנתון מעוגל, הבסיס ישר */
+  }
+  .catrow .vl{flex:0 0 60px; text-align:left; font-size:12.5px; color:var(--ink-2); font-variant-numeric:tabular-nums; direction:ltr; unicode-bidi:isolate}
+  .catrow .chev{flex:0 0 12px; text-align:center; color:var(--muted); font-size:11px; transition:transform .15s}
+  .catcell.open .chev{transform:rotate(180deg); color:var(--ink-2)}
+  .catexp{display:none; padding:1px 0 9px}
+  .catcell.open .catexp{display:block}
+  .exprow{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:6px 4px; font-size:12.5px; border-top:1px solid var(--grid)}
+  .exprow .expnm{color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .exprow .expd{color:var(--muted); font-size:11.5px}
+  .exprow .expamt{color:var(--ink-2); font-variant-numeric:tabular-nums; direction:ltr; unicode-bidi:isolate; white-space:nowrap; flex:none}
+  .catexp-empty{font-size:12px; color:var(--muted); padding:7px 4px}
+
+  /* ===== רשימת עסקאות ===== */
+  .daylbl{font-size:12px; color:var(--muted); margin:14px 2px 4px; font-weight:600}
+  .txrow{
+    display:flex; align-items:center; gap:10px; background:var(--surface);
+    border:1px solid var(--ring); border-radius:14px; padding:10px 12px; margin-bottom:8px;
+  }
+  .txrow .ic{
+    width:34px; height:34px; border-radius:10px; flex:none; display:grid; place-items:center;
+    background:var(--page); border:1px solid var(--grid); font-size:15px;
+  }
+  .txrow .mid{flex:1; min-width:0}
+  .txrow .b{font-size:14px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .txrow .c{font-size:12px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .txrow .amt{font-size:14.5px; font-weight:650; font-variant-numeric:tabular-nums; white-space:nowrap; direction:ltr; unicode-bidi:isolate}
+  .amt.in{color:var(--good-text)}
+  .txrow .del{border:0; background:none; color:var(--muted); font-size:17px; padding:10px 8px; cursor:pointer}
+  .empty{text-align:center; color:var(--muted); font-size:13.5px; padding:26px 10px; line-height:1.7}
+  .link{background:none; border:0; color:var(--accent); font-size:13.5px; cursor:pointer; padding:8px; width:100%; text-align:center}
+
+  /* ===== טופס הוספה ===== */
+  .seg{display:flex; background:var(--page); border:1px solid var(--grid); border-radius:12px; padding:3px; margin-bottom:14px}
+  .seg button{
+    flex:1; border:0; background:none; padding:9px 0; border-radius:9px; font-size:14px;
+    color:var(--ink-2); font-weight:600; cursor:pointer;
+  }
+  .seg button.on{background:var(--surface); color:var(--ink); box-shadow:0 1px 2px rgba(0,0,0,.08); border:1px solid var(--ring)}
+  label.f{display:block; font-size:12.5px; color:var(--ink-2); margin:12px 2px 5px; font-weight:600}
+  input,select,textarea{
+    width:100%; border:1px solid var(--grid); background:var(--surface); color:var(--ink);
+    border-radius:12px; padding:12px; font-size:16px; font-family:inherit; outline:none;
+  } /* 16px מונע זום אוטומטי של ספארי באייפון */
+  input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+  #f_amount{font-size:26px; font-weight:700; text-align:center; padding:14px}
+  .btn{
+    width:100%; border:0; background:var(--accent); color:var(--accent-ink);
+    padding:14px; border-radius:14px; font-size:16px; font-weight:700; cursor:pointer; margin-top:18px;
+  }
+  .btn:active{transform:scale(.99)}
+  .btn.ghost{background:var(--surface); color:var(--ink); border:1px solid var(--grid); font-weight:600}
+  .catchips{display:flex; flex-wrap:wrap; gap:8px}
+  .chip{
+    border:1px solid var(--grid); background:var(--surface); color:var(--ink-2);
+    border-radius:999px; padding:10px 15px; font-size:13.5px; cursor:pointer;
+  }
+  .chip.on{background:var(--accent); border-color:var(--accent); color:var(--accent-ink); font-weight:600}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+
+  /* ===== קבועות ===== */
+  .fixsum{display:flex; gap:12px; font-size:13px; color:var(--ink-2); margin-bottom:10px}
+  .fixsum b{font-variant-numeric:tabular-nums}
+  .fixrow{display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--grid)}
+  .fixrow:last-child{border-bottom:0}
+  .fixrow .mid{flex:1; min-width:0}
+  .fixrow .b{font-size:14px; font-weight:600}
+  .fixrow .c{font-size:12px; color:var(--muted)}
+  .fixrow .amt{font-weight:650; font-variant-numeric:tabular-nums; font-size:14px; direction:ltr; unicode-bidi:isolate}
+  .fixrow.off .b,.fixrow.off .amt{color:var(--muted); text-decoration:line-through}
+  .sw{position:relative; width:40px; height:24px; flex:none; cursor:pointer}
+  .sw input{position:absolute; opacity:0; inset:0; margin:0; cursor:pointer}
+  .sw i{position:absolute; inset:0; background:var(--grid); border-radius:999px; transition:.15s}
+  .sw i::after{
+    content:""; position:absolute; top:3px; inset-inline-start:3px; width:18px; height:18px;
+    background:#fff; border-radius:50%; transition:.15s; box-shadow:0 1px 2px rgba(0,0,0,.25);
+  }
+  .sw input:checked + i{background:var(--inc)}
+  .sw input:checked + i::after{transform:translateX(-16px)}
+
+  /* ===== גרף מגמות ===== */
+  .legend{display:flex; gap:16px; font-size:12.5px; color:var(--ink-2); margin-bottom:4px}
+  .legend span{display:flex; align-items:center; gap:6px}
+  .chartcap{font-size:12.5px; color:var(--ink-2); margin:2px 0 6px; min-height:18px}
+  .chartcap b{color:var(--ink)}
+  .chartwrap{position:relative; direction:ltr}
+  .tt{
+    position:absolute; z-index:5; background:var(--surface); border:1px solid var(--ring);
+    border-radius:10px; padding:8px 10px; font-size:12px; color:var(--ink-2);
+    box-shadow:0 4px 14px rgba(0,0,0,.12); pointer-events:none; display:none; direction:rtl; white-space:nowrap;
+  }
+  .tt b{color:var(--ink); font-variant-numeric:tabular-nums}
+  table.mini{width:100%; border-collapse:collapse; font-size:12.5px; margin-top:8px}
+  table.mini th{color:var(--muted); font-weight:600; text-align:right; padding:5px 2px; border-bottom:1px solid var(--grid)}
+  table.mini td{padding:6px 2px; border-bottom:1px solid var(--grid); font-variant-numeric:tabular-nums; color:var(--ink-2)}
+  table.mini td:not(:first-child){direction:ltr; unicode-bidi:isolate; text-align:right}
+  table.mini td:first-child{color:var(--ink)}
+  table.mini tr:last-child td{border-bottom:0}
+
+  /* ===== ניווט תחתון ===== */
+  nav{
+    position:fixed; bottom:0; inset-inline:0; z-index:30;
+    background:var(--surface); border-top:1px solid var(--grid);
+    display:flex; height:calc(var(--nav-h) + max(env(safe-area-inset-bottom,0px), 12px));
+    padding-bottom:max(env(safe-area-inset-bottom,0px), 12px);
+    max-width:640px; margin:0 auto; border-radius:0;
+  }
+  nav button{
+    flex:1; border:0; background:none; color:var(--muted); font-size:10.5px; cursor:pointer;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; font-weight:600;
+  }
+  nav button svg{width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round}
+  nav button.on{color:var(--accent)}
+  nav .addbtn{position:relative; top:-14px; flex:0 0 72px}
+  nav .addbtn i{
+    width:52px; height:52px; border-radius:50%; background:var(--accent); color:var(--accent-ink);
+    display:grid; place-items:center; font-size:26px; font-style:normal;
+    box-shadow:0 4px 12px rgba(0,0,0,.22); border:4px solid var(--page);
+  }
+
+  /* ===== טוסט ===== */
+  #toast{
+    position:fixed; bottom:calc(var(--nav-h) + max(env(safe-area-inset-bottom,0px), 12px) + 18px);
+    inset-inline:0; margin:auto; width:max-content; max-width:86%;
+    background:var(--ink); color:var(--page); font-size:13.5px; padding:10px 16px; border-radius:999px;
+    opacity:0; transform:translateY(8px); transition:.2s; z-index:40; text-align:center;
+  }
+  #toast.on{opacity:1; transform:none}
+  .banner{background:var(--surface); border:1px dashed var(--baseline); color:var(--muted);
+    font-size:12px; border-radius:12px; padding:8px 12px; text-align:center; margin-bottom:12px}
+
+  /* ===== מסך חיבור ראשוני / הגדרות ===== */
+  .setup{position:fixed; inset:0; z-index:100; background:var(--page); display:flex;
+    align-items:center; justify-content:center; padding:24px;
+    padding-top:calc(24px + env(safe-area-inset-top,0px)); overflow:auto}
+  .setup-card{width:100%; max-width:360px; text-align:center}
+  .setup-logo{width:88px; height:88px; border-radius:22px; box-shadow:0 8px 30px rgba(0,0,0,.4)}
+  .setup h2{font-size:21px; margin:16px 0 2px}
+  .setup-sub{font-size:14px; color:var(--ink-2); margin:0 0 18px}
+  .setup .f{text-align:right}
+  .setup input{margin-bottom:4px}
+  .setup .btn{margin-top:14px}
+  .setup-msg{font-size:13px; margin-top:10px; min-height:18px}
+  .setup-msg.err{color:var(--bad-text)} .setup-msg.ok{color:var(--good-text)}
+  .setup-hint{margin-top:16px; font-size:12px; color:var(--muted); border:1px dashed var(--baseline);
+    border-radius:12px; padding:10px 12px; line-height:1.6}
 </style>
 </head>
 <body>
-<div class="viz-root">
-<div class="wrap">
+<div id="setup" class="setup" style="display:none">
+  <div class="setup-card">
+    <img class="setup-logo" src="icon-180.png" alt="כספיון">
+    <h2>הבנק של כספיון</h2>
+    <p class="setup-sub" id="setupSub">חיבור חד-פעמי לחשבון שלך</p>
+    <label class="f">כתובת ה-API (מסתיימת ב-/exec)</label>
+    <input id="setUrl" type="url" inputmode="url" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="https://script.google.com/macros/s/.../exec">
+    <label class="f">קוד גישה סודי</label>
+    <input id="setToken" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="kaspion_...">
+    <button class="btn" id="setConnect">חיבור</button>
+    <button class="btn ghost" id="setDisconnect" style="display:none; margin-top:10px">ניתוק</button>
+    <div class="setup-msg" id="setMsg"></div>
+    <div class="setup-hint">הפרטים נשמרים רק במכשיר הזה ולא נשלחים לאף אחד. הנתונים עצמם מוגנים בחשבון הגוגל הפרטי שלך.</div>
+  </div>
+</div>
 
-<header class="top">
-  <h1>הלוז של הבולדוג</h1>
-  <span class="sub">היום <b id="cur-date">—</b> · תוכן הסידור עודכן: <span id="content-ver">20.7 · לילה חמישי 23.7 + תרגיל רביעי 22.7</span> · מתוך "סידור בקרים"</span>
+
+<header>
+  <div class="brand">
+    <button class="iconbtn" id="btnRefresh" title="משיכת עדכונים מקלוד">⟳</button>
+    <h1>הבנק של כספיון</h1>
+    <button class="iconbtn" id="btnSettings" title="הגדרות חיבור">⚙</button>
+  </div>
+  <div class="monthbar">
+    <button id="prevM" aria-label="חודש קודם">‹</button>
+    <div id="monthLabel">—</div>
+    <button id="nextM" aria-label="חודש הבא">›</button>
+  </div>
 </header>
 
-<div class="edit-tip">💡 טאץ' על כל בלוק פותח אותו — שם אפשר לכתוב הערה (נשמרת אצלך בטלפון) ולראות פרטים נוספים.</div>
-<div class="legend">
-  <span class="key" style="--c:var(--shift)">משמרת</span>
-  <span class="key" style="--c:var(--sleep)">שינה + התארגנות</span>
-  <span class="key" style="--c:var(--after)">אפטר</span>
-  <span class="key" style="--c:var(--meal)">ארוחה</span>
-  <span class="key prop" style="--c:var(--workout)">אימון — מוצע</span>
-  <span class="key" style="--c:var(--self)">זמן אישי</span>
-  <span class="key" style="--c:var(--hearing)">דיון</span>
-  <span class="key" style="--c:var(--life)">אישי</span>
-  <span class="key dk" style="--c:var(--hot)">עכשיו / הבא בתור</span>
-</div>
+<main id="main">
+  <div id="mockBanner" class="banner" style="display:none">מצב הדגמה — נתוני דוגמה, לא מחובר לחשבון</div>
 
-<div class="tiles">
-  <div class="tile hot" style="--tc:var(--hot)"><div class="k">הבא בתור · מתעדכן לבד</div><div class="v" id="next-tile">שבת · משמרת <span class="t">08:00</span></div></div>
-  <div class="tile" style="--tc:var(--sleep)"><div class="k">השינה הבאה · מתעדכן לבד</div><div class="v" id="sleep-tile">לפי הלוח</div></div>
-  <div class="tile" style="--tc:var(--after)"><div class="k">היציאה הבאה הביתה</div><div class="v">חמישי · ~12:00</div></div>
-  <a class="tile tile-link" style="--tc:var(--workout)" href="https://claude.ai/code/session_01Q3ghzU3CUNUSbB6Mgqk1Vu" target="_blank" rel="noopener"><div class="k">עדכון בלוז? תכתוב לי</div><div class="v">פתיחת הצ'אט עם Claude ←</div></a>
-</div>
+  <!-- ===== ראשי ===== -->
+  <section class="view on" id="v-home">
+    <div class="card hero">
+      <div class="lbl">נטו החודש (כולל קבועות)</div>
+      <div class="val" id="h-net" dir="ltr">—</div>
+      <div class="delta" id="h-delta"></div>
+    </div>
+    <div class="tiles">
+      <div class="tile">
+        <div class="lbl"><span class="dot inc"></span>נכנס</div>
+        <div class="val" id="h-inc" dir="ltr">—</div>
+        <div class="sub" id="h-inc-sub"></div>
+      </div>
+      <div class="tile">
+        <div class="lbl"><span class="dot exp"></span>יוצא</div>
+        <div class="val" id="h-exp" dir="ltr">—</div>
+        <div class="sub" id="h-exp-sub"></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>הוצאות לפי קטגוריה</h2>
+      <div id="h-cats"></div>
+    </div>
+    <div class="card">
+      <h2>עסקאות אחרונות</h2>
+      <div id="h-recent"></div>
+      <button class="link" id="goAllTx">לכל העסקאות ‹</button>
+    </div>
+  </section>
 
-<!-- ש.29 -->
-<section class="week">
-  <div class="week-head"><h2>ש.29 · 12–18 ביולי</h2><span class="tag">שבוע שעבר</span><span class="rule"></span></div>
-  <div class="days">
-    <div class="day past" data-date="2026-07-12"><div class="dh"><span class="dn">ראשון</span><span class="dd">12.7</span></div><div class="free">פנוי</div></div>
-    <div class="day past" data-date="2026-07-13"><div class="dh"><span class="dn">שני</span><span class="dd">13.7</span></div><div class="free">פנוי</div></div>
-    <div class="day past" data-date="2026-07-14"><div class="dh"><span class="dn">שלישי</span><span class="dd">14.7</span></div>
-      <div class="ev" style="--c:var(--shift)"><span class="tc">משמרת</span><span class="t">00:00–04:00</span></div></div>
-    <div class="day past" data-date="2026-07-15"><div class="dh"><span class="dn">רביעי</span><span class="dd">15.7</span></div>
-      <div class="ev" style="--c:var(--shift)"><span class="tc">משמרת</span><span class="t">20:00–00:00</span></div></div>
-    <div class="day past" data-date="2026-07-16"><div class="dh"><span class="dn">חמישי</span><span class="dd">16.7</span></div>
-      <div class="ev" style="--c:var(--shift)"><span class="tc">משמרת</span><span class="t">08:00–12:00</span></div>
-      <div class="ev" style="--c:var(--shift)"><span class="tc">משמרת</span><span class="t">20:00–00:00</span></div></div>
-    <div class="day today" data-date="2026-07-17"><div class="dh"><span class="dn">שישי</span><span class="dd">17.7</span><span class="badge">היום</span></div>
-      <div class="ev" style="--c:var(--shift);opacity:.45"><span class="tc">משמרת</span><span class="t">00:00–02:00</span></div>
-      <div class="ev" style="--c:var(--shift)"><span class="tc">משמרת</span><span class="t">12:00–16:00</span></div>
-      <div class="ev" style="--c:var(--self)"><span class="tc">זמן אישי</span><span class="t">16:00–19:45</span></div>
-      <div class="ev" style="--c:var(--meal)"><span class="tc">ארוחה</span><span class="t">20:00–22:00</span><span class="l">ארוחת ערב</span></div>
-      <div class="ev" style="--c:var(--sleep)" title="במיטה 23:30, השכמה 07:40"><span class="tc">שינה</span><span class="t">23:30–07:40</span><span class="l">לפני משמרת הבוקר</span></div></div>
-    <div class="day" data-date="2026-07-18"><div class="dh"><span class="dn">שבת</span><span class="dd">18.7</span></div>
-      <div class="ev" style="--c:var(--sleep)"><span class="tc">התארגנות</span><span class="t">07:40–08:00</span></div>
-      <div class="ev" style="--c:var(--shift)"><span class="tc">משמרת</span><span class="t">08:00–12:00</span></div>
-      <div class="ev" style="--c:var(--self)"><span class="tc">זמן אישי</span><span class="t">12:00–14:00</span></div>
-      <div class="ev" style="--c:var(--sleep)" title="מנוחה לפני הכפולה"><span class="tc">שנ"צ</span><span class="t">14:00–16:00</span></div>
-      <div class="ev" style="--c:var(--self)"><span class="tc">זמן אישי</span><span class="t">16:00–19:45</span></div>
-      <div class="ev" style="--c:var(--shift)"><span class="tc">כפולה</span><span class="t">20:00–04:00</span><span class="l">עד ראשון בבוקר</span></div></div>
-  </div>
-</section>
+  <!-- ===== הוספה ===== -->
+  <section class="view" id="v-add">
+    <div class="card">
+      <div class="seg" id="f_type">
+        <button data-t="הוצאה" class="on">הוצאה</button>
+        <button data-t="הכנסה">הכנסה</button>
+      </div>
+      <label class="f">סכום בש״ח</label>
+      <input id="f_amount" type="text" inputmode="decimal" placeholder="0" autocomplete="off">
+      <label class="f">קטגוריה</label>
+      <div class="catchips" id="f_cats"></div>
+      <label class="f">בית עסק / תיאור</label>
+      <input id="f_business" type="text" placeholder="למשל: סופר יוחננוף" list="bizlist" autocomplete="off">
+      <datalist id="bizlist"></datalist>
+      <div class="grid2">
+        <div>
+          <label class="f">תאריך</label>
+          <input id="f_date" type="date">
+        </div>
+        <div>
+          <label class="f">הערה (רשות)</label>
+          <input id="f_note" type="text" placeholder="">
+        </div>
+      </div>
+      <button class="btn" id="f_save">שמירה</button>
+    </div>
+  </section>
 
-<!-- ש.30 -->
-<section class="week">
-  <div class="week-head"><h2>ש.30 · 19–25 ביולי</h2><span class="tag now">השבוע</span><span class="rule"></span></div>
-  <div class="days">
-    <div class="day" data-date="2026-07-19"><div class="dh"><span class="dn">ראשון</span><span class="dd">19.7</span></div>
-      <div class="ev" style="--c:var(--shift)"><span class="tc">כפולה</span><span class="t">עד 04:00</span></div>
-      <div class="ev" style="--c:var(--sleep)" title="7 שעות התאוששות אחרי הכפולה"><span class="tc">שינה</span><span class="t">04:30–11:30</span></div>
-      <div class="ev" style="--c:var(--meal)"><span class="tc">ארוחה</span><span class="t">11:30–12:30</span></div>
-      <div class="note">חופש · בערב גמר המונדיאל</div></div>
-    <div class="day" data-date="2026-07-20"><div class="dh"><span class="dn">שני</span><span class="dd">20.7</span></div>
-      <div class="ev" style="--c:var(--workout)"><span class="tc">אימון</span><span class="t">10:00–11:30</span><span class="l">בבסיס</span></div>
-      <div class="ev" style="--c:var(--meal)"><span class="tc">ארוחה</span><span class="t">11:30–12:30</span></div>
-      <div class="ev" style="--c:var(--self)"><span class="tc">זמן אישי</span><span class="t">13:00–15:15</span></div>
-      <div class="ev" style="--c:var(--hearing)"><span class="tc">דיון</span><span class="t">15:15–16:00</span><span class="l">שיחת פתיחה עם החיילים</span></div>
-      <div class="ev" style="--c:var(--shift)"><span class="tc">משמרת</span><span class="t">16:00–20:00</span></div>
-      <div class="ev" style="--c:var(--hearing);opacity:.55"><span class="tc">דיון</span><span class="t">16:30–17:00</span><span class="l">תחקיר · בזמן משמרת (לידיעה)</span></div>
-      <div class="ev" style="--c:var(--sleep)" title="מחר קמים ב-03:40"><span class="tc">שינה</span><span class="t">21:00–03:40</span><span class="l">מוקדם — מחר קמים ב-3:40</span></div></div>
-    <div class="day" data-date="2026-07-21"><div class="dh"><span class="dn">שלישי</span><span class="dd">21.7</span></div>
-      <div class="ev" style="--c:var(--sleep)"><span class="tc">התארגנות</span><span class="t">03:40–04:00</span></div>
-      <div class="ev" style="--c:var(--shift)"><span class="tc">משמרת</span><span class="t">04:00–08:00</span></div>
-      <div class="ev" style="--c:var(--sleep)" title="השלמה ל-7 שעות ביום עם שתי משמרות"><span class="tc">השלמה</span><span class="t">09:30–11:30</span></div>
-      <div class="ev" style="--c:var(--meal)"><span class="tc">ארוחה</span><span class="t">11:30–12:30</span></div>
-      <div class="ev" style="--c:var(--self)"><span class="tc">זמן אישי</span><span class="t">13:00–15:30</span></div>
-      <div class="ev" style="--c:var(--shift)"><span class="tc">משמרת</span><span class="t">16:00–20:00</span></div>
-      <div class="ev" style="--c:var(--sleep)"><span class="tc">שינה</span><span class="t">21:00–03:40</span></div></div>
-    <div class="day" data-date="2026-07-22"><div class="dh"><span class="dn">רביעי</span><span class="dd">22.7</span></div>
-      <div class="ev" style="--c:var(--sleep)"><span class="tc">התארגנות</span><span class="t">03:40–04:00</span></div>
-      <div class="ev" style="--c:var(--shift)" title="כולל תרגיל 08:00–09:00"><span class="tc">משמרת</span><span class="t">04:00–09:00</span><span class="l">כולל תרגיל 08:00–09:00</span></div>
-      <div class="ev" style="--c:var(--sleep)"><span class="tc">התאוששות</span><span class="t">09:30–13:00</span></div>
-      <div class="ev" style="--c:var(--self)"><span class="tc">זמן אישי</span><span class="t">13:00–19:00</span></div>
-      <div class="ev" style="--c:var(--sleep)" title="לפני משמרת הלילה"><span class="tc">שינה</span><span class="t">19:00–23:40</span><span class="l">לפני הלילה</span></div></div>
-    <div class="day" data-date="2026-07-23"><div class="dh"><span class="dn">חמישי</span><span class="dd">23.7</span></div>
-      <div class="ev" style="--c:var(--life)"><span class="tc">סרט</span><span class="t">23:59–03:00</span></div>
-      <div class="ev" style="--c:var(--shift)"><span class="tc">לילה</span><span class="t">00:00–04:00</span></div>
-      <div class="ev" style="--c:var(--sleep)" title="7 שעות אחרי הלילה"><span class="tc">התאוששות</span><span class="t">04:30–11:30</span></div>
-      <div class="ev" style="--c:var(--after)" title="המשמרת נגמרת לפני 16:00 — יוצאים ב-12:00"><span class="tc">אפטר</span><span class="t">12:00</span><span class="l">יציאה הביתה · עד סוף השבוע</span></div></div>
-    <div class="day" data-date="2026-07-24"><div class="dh"><span class="dn">שישי</span><span class="dd">24.7</span></div>
-      <div class="ev" style="--c:var(--life)"><span class="tc">בר מצווה</span><span class="t">10:00–14:00</span></div>
-      <div class="note">בבית — אפטר</div><div class="free">פנוי</div></div>
-    <div class="day" data-date="2026-07-25"><div class="dh"><span class="dn">שבת</span><span class="dd">25.7</span></div>
-      <div class="note">בבית — אפטר</div>
-      <div class="ev proposed" style="--c:var(--workout)"><span class="tc">אימון</span><span class="t">10:00–11:30</span><span class="chip">אופציונלי</span><span class="l">בבית — רק אם בא לך</span></div></div>
-  </div>
-</section>
+  <!-- ===== עסקאות ===== -->
+  <section class="view" id="v-tx">
+    <div id="txlist"></div>
+  </section>
 
-<!-- ש.31 -->
-<section class="week">
-  <div class="week-head"><h2>ש.31 · 26 ביולי – 1 באוגוסט</h2><span class="tag">סידור חלקי — מתעדכן</span><span class="rule"></span></div>
-  <div class="days">
-    <div class="day" data-date="2026-07-26"><div class="dh"><span class="dn">ראשון</span><span class="dd">26.7</span></div>
-      <div class="ev" style="--c:var(--meal)"><span class="tc">ארוחה</span><span class="t">11:30–12:00</span><span class="l">מקוצר — משמרת ב-12:00</span></div>
-      <div class="ev" style="--c:var(--shift)"><span class="tc">משמרת</span><span class="t">12:00–16:00</span></div></div>
-    <div class="day" data-date="2026-07-27"><div class="dh"><span class="dn">שני</span><span class="dd">27.7</span></div>
-      <div class="ev" style="--c:var(--shift)"><span class="tc">לילה</span><span class="t">00:00–04:00</span></div>
-      <div class="ev" style="--c:var(--meal)"><span class="tc">ארוחה</span><span class="t">11:30–12:30</span></div></div>
-    <div class="day" data-date="2026-07-28"><div class="dh"><span class="dn">שלישי</span><span class="dd">28.7</span></div>
-      <div class="ev" style="--c:var(--shift)"><span class="tc">לילה</span><span class="t">00:00–04:00</span></div>
-      <div class="ev" style="--c:var(--meal)"><span class="tc">ארוחה</span><span class="t">11:30–12:30</span></div></div>
-    <div class="day" data-date="2026-07-29"><div class="dh"><span class="dn">רביעי</span><span class="dd">29.7</span></div>
-      <div class="ev" style="--c:var(--meal)"><span class="tc">ארוחה</span><span class="t">11:30–12:30</span></div>
-      <div class="tbd">טרם שובץ</div></div>
-    <div class="day" data-date="2026-07-30"><div class="dh"><span class="dn">חמישי</span><span class="dd">30.7</span></div>
-      <div class="ev" style="--c:var(--meal)"><span class="tc">ארוחה</span><span class="t">11:30–12:30</span></div>
-      <div class="tbd">טרם שובץ</div></div>
-    <div class="day" data-date="2026-07-31"><div class="dh"><span class="dn">שישי</span><span class="dd">31.7</span></div>
-      <div class="ev" style="--c:var(--meal)"><span class="tc">ארוחה</span><span class="t">20:00–22:00</span><span class="l">ארוחת ערב</span></div>
-      <div class="tbd">טרם שובץ</div></div>
-    <div class="day" data-date="2026-08-01"><div class="dh"><span class="dn">שבת</span><span class="dd">1.8</span></div><div class="tbd">טרם שובץ</div></div>
-  </div>
-  <p style="font-size:12px;color:var(--muted);margin:10px 2px 0;font-weight:500">תכנון שינה לשבוע הזה יתווסף כשהסידור יתמלא · בהערות מופיע "מירון ודנה?" לשישי 31.7 — עוד לא סגור.</p>
-</section>
+  <!-- ===== קבועות ===== -->
+  <section class="view" id="v-fixed">
+    <div class="card">
+      <h2>סיכום חודשי קבוע</h2>
+      <div class="fixsum">
+        <span><span class="dot inc"></span> הכנסות: <b id="fx-inc">—</b></span>
+        <span><span class="dot exp"></span> הוצאות: <b id="fx-exp">—</b></span>
+      </div>
+      <div style="font-size:12px;color:var(--muted)">קבועות נספרות אוטומטית בכל חודש — אין צורך לרשום אותן שוב ידנית.</div>
+    </div>
+    <div class="card">
+      <h2>הכנסות קבועות</h2>
+      <div id="fx-list-inc"></div>
+    </div>
+    <div class="card">
+      <h2>הוצאות קבועות</h2>
+      <div id="fx-list-exp"></div>
+    </div>
+    <div class="card">
+      <h2>הוספת קבועה</h2>
+      <div class="seg" id="fx_type">
+        <button data-t="הוצאה" class="on">הוצאה</button>
+        <button data-t="הכנסה">הכנסה</button>
+      </div>
+      <div class="grid2">
+        <div>
+          <label class="f">שם</label>
+          <input id="fx_name" type="text" placeholder="שכר דירה / משכורת">
+        </div>
+        <div>
+          <label class="f">סכום בש״ח</label>
+          <input id="fx_amount" type="text" inputmode="decimal" placeholder="0">
+        </div>
+      </div>
+      <label class="f">קטגוריה</label>
+      <select id="fx_cat"></select>
+      <label class="f">יום בחודש</label>
+      <input id="fx_day" type="number" min="1" max="31" value="1">
+      <button class="btn ghost" id="fx_save">הוספת קבועה</button>
+    </div>
+  </section>
 
-<section class="week">
-  <div class="week-head"><h2>המספרים של הבולדוג</h2><span class="tag">חישוב שבועי · עמוד עם העכבר לפירוט</span><span class="rule"></span></div>
-  <div class="tiles" id="stat-tiles"></div>
-  <div class="bars" id="stat-bars"></div>
-</section>
+  <!-- ===== מגמות ===== -->
+  <section class="view" id="v-trend">
+    <div class="card" id="atCard" style="display:none; text-align:center">
+      <h2 id="at-title">המאזן הכולל</h2>
+      <div id="at-net" dir="ltr" style="font-size:36px; font-weight:700; letter-spacing:-.5px"></div>
+      <div style="display:flex; justify-content:center; gap:20px; font-size:13px; color:var(--ink-2); margin-top:8px">
+        <span><span class="dot inc"></span> נכנס <b id="at-inc" dir="ltr" style="font-variant-numeric:tabular-nums"></b></span>
+        <span><span class="dot exp"></span> יצא <b id="at-exp" dir="ltr" style="font-variant-numeric:tabular-nums"></b></span>
+      </div>
+      <div id="at-sub" style="font-size:11.5px; color:var(--muted); margin-top:7px"></div>
+    </div>
+    <div class="card">
+      <h2>נכנס מול יוצא — 6 חודשים</h2>
+      <div class="legend">
+        <span><span class="dot inc"></span> הכנסות</span>
+        <span><span class="dot exp"></span> הוצאות</span>
+      </div>
+      <div class="chartcap" id="trendCap"></div>
+      <div class="chartwrap">
+        <svg id="trendSvg" width="100%" height="216" role="img" aria-label="גרף עמודות: הכנסות מול הוצאות בששת החודשים האחרונים"></svg>
+        <div class="tt" id="trendTT"></div>
+      </div>
+      <table class="mini" id="trendTable"></table>
+    </div>
+  </section>
+</main>
 
-<details class="tbl">
-  <summary>תצוגת טבלה — כל האירועים</summary>
-  <table>
-    <thead><tr><th>תאריך</th><th>יום</th><th>שעות</th><th>סוג</th><th>סטטוס</th></tr></thead>
-    <tbody>
-      <tr><td>17.7</td><td>שישי</td><td dir="ltr">12:00–16:00</td><td><span class="dot" style="--c:var(--shift)"></span>משמרת</td><td class="st-in">ביומן ✓</td></tr>
-      <tr><td>17.7</td><td>שישי</td><td dir="ltr">16:00–19:45</td><td><span class="dot" style="--c:var(--self)"></span>זמן אישי</td><td class="st-in">ביומן ✓</td></tr>
-      <tr><td>17.7</td><td>שישי</td><td dir="ltr">23:30–07:40</td><td><span class="dot" style="--c:var(--sleep)"></span>שינה</td><td class="st-in">ביומן ✓</td></tr>
-      <tr><td>18.7</td><td>שבת</td><td dir="ltr">08:00–12:00</td><td><span class="dot" style="--c:var(--shift)"></span>משמרת</td><td class="st-in">ביומן ✓</td></tr>
-      <tr><td>18.7</td><td>שבת</td><td dir="ltr">12:00–14:00</td><td><span class="dot" style="--c:var(--self)"></span>זמן אישי</td><td class="st-in">ביומן ✓</td></tr>
-      <tr><td>18.7</td><td>שבת</td><td dir="ltr">14:00–16:00</td><td><span class="dot" style="--c:var(--sleep)"></span>שנ"צ</td><td class="st-in">ביומן ✓</td></tr>
-      <tr><td>18.7</td><td>שבת</td><td dir="ltr">16:00–19:45</td><td><span class="dot" style="--c:var(--self)"></span>זמן אישי</td><td class="st-in">ביומן ✓</td></tr>
-      <tr><td>18.7–19.7</td><td>שבת→ראשון</td><td dir="ltr">20:00–04:00</td><td><span class="dot" style="--c:var(--shift)"></span>משמרת כפולה</td><td class="st-in">ביומן ✓</td></tr>
-      <tr><td>19.7</td><td>ראשון</td><td dir="ltr">04:30–11:30</td><td><span class="dot" style="--c:var(--sleep)"></span>שינה — התאוששות</td><td class="st-in">ביומן ✓</td></tr>
-      <tr><td>20.7</td><td>שני</td><td dir="ltr">10:00–11:30</td><td><span class="dot" style="--c:var(--workout)"></span>אימון (בבסיס)</td><td class="st-prop">מוצע</td></tr>
-      <tr><td>20.7</td><td>שני</td><td dir="ltr">13:00–15:30</td><td><span class="dot" style="--c:var(--self)"></span>זמן אישי</td><td class="st-in">ביומן ✓</td></tr>
-      <tr><td>20.7</td><td>שני</td><td dir="ltr">16:00–20:00</td><td><span class="dot" style="--c:var(--shift)"></span>משמרת</td><td class="st-in">ביומן ✓</td></tr>
-      <tr><td>20.7–21.7</td><td>שני→שלישי</td><td dir="ltr">21:00–03:40</td><td><span class="dot" style="--c:var(--sleep)"></span>שינה</td><td class="st-in">ביומן ✓</td></tr>
-      <tr><td>21.7</td><td>שלישי</td><td dir="ltr">04:00–08:00</td><td><span class="dot" style="--c:var(--shift)"></span>משמרת</td><td class="st-in">ביומן ✓</td></tr>
-      <tr><td>21.7</td><td>שלישי</td><td dir="ltr">09:30–11:30</td><td><span class="dot" style="--c:var(--sleep)"></span>השלמת שינה</td><td class="st-in">ביומן ✓</td></tr>
-      <tr><td>21.7</td><td>שלישי</td><td dir="ltr">13:00–15:30</td><td><span class="dot" style="--c:var(--self)"></span>זמן אישי</td><td class="st-in">ביומן ✓</td></tr>
-      <tr><td>21.7</td><td>שלישי</td><td dir="ltr">16:00–20:00</td><td><span class="dot" style="--c:var(--shift)"></span>משמרת</td><td class="st-in">ביומן ✓</td></tr>
-      <tr><td>21.7–22.7</td><td>שלישי→רביעי</td><td dir="ltr">21:00–03:40</td><td><span class="dot" style="--c:var(--sleep)"></span>שינה</td><td class="st-in">ביומן ✓</td></tr>
-      <tr><td>22.7</td><td>רביעי</td><td dir="ltr">04:00–09:00</td><td><span class="dot" style="--c:var(--shift)"></span>משמרת + תרגיל</td><td class="st-in">ביומן ✓</td></tr>
-      <tr><td>22.7</td><td>רביעי</td><td dir="ltr">09:30–13:00</td><td><span class="dot" style="--c:var(--sleep)"></span>שינה — התאוששות</td><td class="st-in">ביומן ✓</td></tr>
-      <tr><td>22.7</td><td>רביעי</td><td dir="ltr">13:00–19:00</td><td><span class="dot" style="--c:var(--self)"></span>זמן אישי</td><td class="st-in">ביומן ✓</td></tr>
-      <tr><td>22.7</td><td>רביעי</td><td dir="ltr">19:00–23:40</td><td><span class="dot" style="--c:var(--sleep)"></span>שינה — לפני הלילה</td><td class="st-in">ביומן ✓</td></tr>
-      <tr><td>23.7</td><td>חמישי</td><td dir="ltr">00:00–04:00</td><td><span class="dot" style="--c:var(--shift)"></span>משמרת לילה</td><td class="st-in">ביומן ✓</td></tr>
-      <tr><td>23.7</td><td>חמישי</td><td dir="ltr">04:30–11:30</td><td><span class="dot" style="--c:var(--sleep)"></span>שינה — התאוששות</td><td class="st-in">ביומן ✓</td></tr>
-      <tr><td>23.7–25.7</td><td>חמישי–שבת</td><td dir="ltr">12:00 →</td><td><span class="dot" style="--c:var(--after)"></span>אפטר — בבית</td><td class="st-in">ביומן ✓</td></tr>
-      <tr><td>25.7</td><td>שבת</td><td dir="ltr">10:00–11:30</td><td><span class="dot" style="--c:var(--workout)"></span>אימון בבית</td><td class="st-prop">המלצה</td></tr>
-      <tr><td>26.7</td><td>ראשון</td><td dir="ltr">12:00–16:00</td><td><span class="dot" style="--c:var(--shift)"></span>משמרת</td><td class="st-in">ביומן ✓</td></tr>
-      <tr><td>27.7</td><td>שני</td><td dir="ltr">00:00–04:00</td><td><span class="dot" style="--c:var(--shift)"></span>משמרת לילה</td><td class="st-in">ביומן ✓</td></tr>
-      <tr><td>28.7</td><td>שלישי</td><td dir="ltr">00:00–04:00</td><td><span class="dot" style="--c:var(--shift)"></span>משמרת לילה</td><td class="st-in">ביומן ✓</td></tr>
-      <tr><td>א׳–ה׳ קבוע</td><td>—</td><td dir="ltr">11:30–12:30</td><td><span class="dot" style="--c:var(--meal)"></span>ארוחת צהריים · רק בבסיס</td><td class="st-in">ביומן ✓</td></tr>
-      <tr><td>שישי קבוע</td><td>—</td><td dir="ltr">20:00–22:00</td><td><span class="dot" style="--c:var(--meal)"></span>ארוחת ערב · רק בבסיס</td><td class="st-in">ביומן ✓</td></tr>
-    </tbody>
-  </table>
-</details>
+<nav>
+  <button data-v="v-home" class="on">
+    <svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9h13v-9"/></svg>
+    ראשי
+  </button>
+  <button data-v="v-tx">
+    <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+    עסקאות
+  </button>
+  <button data-v="v-add" class="addbtn" aria-label="הוספה"><i>+</i></button>
+  <button data-v="v-fixed">
+    <svg viewBox="0 0 24 24"><path d="M17 2v4M7 22v-4"/><path d="M21 8a5 5 0 0 0-5-4H7"/><path d="M3 16a5 5 0 0 0 5 4h9"/></svg>
+    קבועות
+  </button>
+  <button data-v="v-trend">
+    <svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M21 20H3"/></svg>
+    מגמות
+  </button>
+</nav>
 
-<footer>
-  ההדגשה של "היום", הימים שעברו והסימון הצהוב של עכשיו/הבא-בתור מתעדכנים לבד בכל פתיחה של הקובץ · תוכן חדש (משמרות, דיונים) נכנס כשאני מושך את הסידור מחדש.<br>
-  יעד שינה: 7 שעות · התארגנות = 20 הדקות שלפני המשמרת (למשל 03:40–04:00) · בימים עם שתי משמרות — שינה מוקדמת + השלמה.<br>
-  אימונים רק בזמן בסיס · כל חור פנוי בבסיס (כשאין חוב שינה) הופך לזמן אישי · אין ארוחות ואין זמן-עצמי ביומן כשאתה בבית.<br>
-  ארוחות בבסיס: צהריים 11:30–12:30 (א׳–ה׳), ערב שישי 20:00–22:00 · יציאות הביתה: אפטר ~12:00 · משמרת שנגמרת ב-16:00 — יציאה ב-16:00 · משמרת שנגמרת לפני 16:00 — יציאה ב-12:00 · חמישי רגיל ~12:00.<br>
-  תזכורות ביומן גוגל: שעה לפני משמרת · לילה/בוקר-מוקדם גם ב-21:00 בערב הקודם · "ללכת לישון" חצי שעה לפני.<br>
-  מקור: גיליון "סידור בקרים" (טאב בקר; מאוגוסט גם טאב מפקדת ירוט) · נבנה אוטומטית ע"י Claude.
-</footer>
+<div id="toast"></div>
 
-</div>
-</div>
 <script>
-(function(){
-  var now=new Date();
-  function pad(n){return (n<10?'0':'')+n}
-  var todayStr=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate());
-  var cd=document.getElementById('cur-date');
-  if(cd){var dnames=['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];cd.textContent='יום '+dnames[now.getDay()]+' '+now.getDate()+'.'+(now.getMonth()+1)+'.'+now.getFullYear();}
-  var days=[].slice.call(document.querySelectorAll('.day[data-date]'));
-  days.forEach(function(d){
-    d.classList.remove('today','past');
-    var b=d.querySelector('.badge'); if(b) b.remove();
-    var ds=d.getAttribute('data-date');
-    if(ds===todayStr){
-      d.classList.add('today');
-      var nb=document.createElement('span'); nb.className='badge'; nb.textContent='היום';
-      d.querySelector('.dh').appendChild(nb);
-    } else if(ds<todayStr){ d.classList.add('past'); }
+/* ================= עזרי בסיס ================= */
+var HEB_MONTHS = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+var fmt0 = new Intl.NumberFormat('he-IL',{maximumFractionDigits:0});
+var fmt2 = new Intl.NumberFormat('he-IL',{minimumFractionDigits:0,maximumFractionDigits:2});
+function nis(n){ return fmt0.format(Math.round(n||0)) + ' ₪'; }
+function nisC(n){ return fmt2.format(n||0) + ' ₪'; }
+function mspan(s){ return '<span dir="ltr" style="unicode-bidi:isolate">' + esc(s) + '</span>'; }
+function compact(n){
+  n = Math.round(n||0);
+  if (Math.abs(n) >= 1000) {
+    var k = n/1000;
+    return (Math.abs(k)>=100 ? Math.round(k) : Math.round(k*10)/10) + 'K';
+  }
+  return String(n);
+}
+function monthLabel(key){
+  var p = key.split('-');
+  return HEB_MONTHS[Number(p[1])-1] + ' ' + p[0];
+}
+function shortMonth(key){ return HEB_MONTHS[Number(key.split('-')[1])-1]; }
+function addMonths(key, delta){
+  var p = key.split('-');
+  var d = new Date(Number(p[0]), Number(p[1])-1+delta, 1);
+  return d.getFullYear() + '-' + ('0'+(d.getMonth()+1)).slice(-2);
+}
+function el(id){ return document.getElementById(id); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function toast(msg){
+  var t = el('toast'); t.textContent = msg; t.classList.add('on');
+  clearTimeout(t._h); t._h = setTimeout(function(){ t.classList.remove('on'); }, 2600);
+}
+
+var CAT_ICONS = {
+  'מזון וסופר':'🛒','אוכל בחוץ':'🍽️','תחבורה ודלק':'🚗','דיור':'🏠','חשבונות ותקשורת':'💡',
+  'בריאות ופארם':'💊','פנאי ובילויים':'🎬','קניות':'🛍️','חינוך וילדים':'🎒',
+  'מנויי AI ונספחים':'🤖','מתנות ותרומות':'🎁','העברות':'🔁','משכורת':'💼','עסק ופרילנס':'🧑‍💻',
+  'העברות ומתנות':'🎁','קנטינה ובסיס':'🪖','אחר':'📦',
+  /* שמות ישנים לתאימות עד שהגיליון יעודכן */
+  'קניות וביגוד':'🛍️','מנויים ודיגיטל':'🤖','AI וכלים טכנולוגיים':'🤖'
+};
+function catIcon(c){ return CAT_ICONS[c] || '📦'; }
+
+/* ================= שכבת API (JSONP אל Google Apps Script) ================= */
+var CFG_KEY = 'kaspion_cfg_v1';
+function loadCfg(){ try { return JSON.parse(localStorage.getItem(CFG_KEY) || 'null'); } catch(e){ return null; } }
+function saveCfg(url, token){ localStorage.setItem(CFG_KEY, JSON.stringify({url:url, token:token})); CFG = loadCfg(); }
+function clearCfg(){ try { localStorage.removeItem(CFG_KEY); } catch(e){} CFG = null; }
+var CFG = loadCfg();
+var DEMO = (location.protocol === 'file:' || /[?&]demo\b/.test(location.search));
+var IS_MOCK = DEMO;
+
+// קריאת JSONP: מזריקים <script> ומקבלים callback — עוקף CORS לגמרי
+function jsonp(params){
+  return new Promise(function(res, rej){
+    if (!CFG || !CFG.url) { rej(new Error('לא מחובר')); return; }
+    var cbName = 'kcb_' + (jsonp._n = (jsonp._n||0)+1) + '_' + Date.now();
+    var s = document.createElement('script');
+    var to = setTimeout(function(){ done(); rej(new Error('אין תשובה מהשרת — בדוק חיבור לאינטרנט')); }, 30000);
+    function done(){ clearTimeout(to); try{ delete window[cbName]; }catch(e){ window[cbName]=undefined; } if (s.parentNode) s.parentNode.removeChild(s); }
+    window[cbName] = function(data){ done();
+      if (data && data.ok === false && data.error) rej(new Error(data.error)); else res(data);
+    };
+    params.token = CFG.token; params.callback = cbName; params._ = Date.now();
+    var qs = Object.keys(params).map(function(k){
+      return encodeURIComponent(k) + '=' + encodeURIComponent(params[k]==null ? '' : params[k]); }).join('&');
+    s.src = CFG.url + (CFG.url.indexOf('?')>=0 ? '&' : '?') + qs;
+    s.onerror = function(){ done(); rej(new Error('שגיאת רשת')); };
+    document.head.appendChild(s);
   });
-  [].slice.call(document.querySelectorAll('.hot-chip')).forEach(function(c){c.remove()});
-  [].slice.call(document.querySelectorAll('.ev.live,.ev.next')).forEach(function(e){e.classList.remove('live','next')});
-  function mins(s){var p=s.split(':');return (+p[0])*60+(+p[1])}
-  var cur=now.getHours()*60+now.getMinutes();
-  var all=[];
-  days.sort(function(a,b){return a.dataset.date<b.dataset.date?-1:1}).forEach(function(d){
-    [].slice.call(d.querySelectorAll('.ev')).forEach(function(ev){
-      if(ev.classList.contains('proposed'))return;
-      var tEl=ev.querySelector('.t'); if(!tEl)return;
-      var m=tEl.textContent.match(/(\d{1,2}:\d{2})–(\d{1,2}:\d{2})/); if(!m)return;
-      var dnEl=d.querySelector('.dn');
-      all.push({ev:ev,tEl:tEl,date:d.dataset.date,dn:dnEl?dnEl.textContent:'',s:mins(m[1]),e:mins(m[2])});
-    });
+}
+
+// תצורת iframe: טוענים <iframe> אל ה-API, והדף שחוזר שולח את הנתונים ב-postMessage.
+// עוקף את מגבלת iOS במצב אפליקציה (שם טעינת <script> חוצת-דומיין נכשלת).
+function frameCall(params){
+  return new Promise(function(res, rej){
+    if (!CFG || !CFG.url) { rej(new Error('לא מחובר')); return; }
+    var nonce = 'kf_' + (frameCall._n = (frameCall._n||0)+1) + '_' + Date.now();
+    var ifr = document.createElement('iframe');
+    ifr.setAttribute('aria-hidden', 'true');
+    ifr.style.cssText = 'position:absolute; width:1px; height:1px; border:0; left:-9999px; top:-9999px';
+    var to = setTimeout(function(){ cleanup(); rej(new Error('frame-timeout')); }, 20000);
+    function onMsg(ev){
+      var d = ev.data; if (typeof d !== 'string') return;
+      var m; try { m = JSON.parse(d); } catch(e){ return; }
+      if (!m || !m.__kaspion || m.nonce !== nonce) return;
+      cleanup();
+      if (m.data && m.data.ok === false && m.data.error) rej(new Error(m.data.error)); else res(m.data);
+    }
+    function cleanup(){ clearTimeout(to); window.removeEventListener('message', onMsg); if (ifr.parentNode) ifr.parentNode.removeChild(ifr); }
+    window.addEventListener('message', onMsg);
+    params.token = CFG.token; params.transport = 'frame'; params.nonce = nonce; params._ = Date.now();
+    var qs = Object.keys(params).map(function(k){
+      return encodeURIComponent(k) + '=' + encodeURIComponent(params[k]==null ? '' : params[k]); }).join('&');
+    ifr.src = CFG.url + (CFG.url.indexOf('?')>=0 ? '&' : '?') + qs;
+    document.body.appendChild(ifr);
   });
-  function mark(item,cls,txt){
-    item.ev.classList.add(cls);
-    var chip=document.createElement('span');chip.className='hot-chip';chip.textContent=txt;
-    item.tEl.insertAdjacentElement('afterend',chip);
+}
+
+function api(fn){
+  var a = Array.prototype.slice.call(arguments, 1);
+  if (IS_MOCK) return mockApi(fn, a);
+  var base = { api: fn };
+  var x = a[0];
+  if (x && typeof x === 'object') { for (var k in x) base[k] = x[k]; }
+  else if (x !== undefined && x !== null) {
+    if (fn === 'getData') base.month = x; else base.id = x;  // delete/toggle => id
   }
-  // אירוע חי מהיום — אירוע חוצה-חצות נחשב "עכשיו" רק מרגע תחילתו בערב, לא בזנב הבוקר שלו
-  var live=null, liveIsYesterday=false, next=null;
-  for(var i=0;i<all.length;i++){
-    var it=all[i];
-    if(it.date!==todayStr) continue;
-    var isLive = it.e>it.s ? (cur>=it.s&&cur<it.e) : (cur>=it.s);
-    if(isLive){ live=it; break; }
-  }
-  // אם אין — זנב של אירוע חוצה-חצות מאתמול (שינה/כפולה שנמשכת אל תוך הבוקר)
-  if(!live){
-    var yd=new Date(now.getTime()-86400000);
-    var yts=yd.getFullYear()+'-'+pad(yd.getMonth()+1)+'-'+pad(yd.getDate());
-    for(var j=0;j<all.length;j++){
-      var y=all[j];
-      if(y.date===yts && y.e<y.s && cur<y.e){ live=y; liveIsYesterday=true; break; }
-    }
-  }
-  for(var k=0;k<all.length;k++){
-    var c=all[k];
-    if(c.date===todayStr && c.s>cur){ next=c; break; }
-    if(c.date>todayStr){ next=c; break; }
-  }
-  if(live && !liveIsYesterday){ mark(live,'live','עכשיו'); }
-  else if(next){ mark(next,'next','הבא בתור'); }
-  var tile=document.getElementById('next-tile');
-  function tileTxt(it,prefix){
-    var tc=it.ev.querySelector('.tc');
-    var name=tc?tc.textContent:'אירוע';
-    return prefix+' · '+name+' <span class="t">'+it.tEl.textContent+'</span>';
-  }
-  if(tile){
-    if(live) tile.innerHTML=tileTxt(live,'עכשיו');
-    else if(next) tile.innerHTML=tileTxt(next, next.date===todayStr?'היום':next.dn);
-  }
-  // כרטיס "השינה הבאה" — האירוע-שינה הרלוונטי הקרוב (לא התארגנות)
-  var st=document.getElementById('sleep-tile');
-  if(st){
-    var pick=null;
-    if(live && liveIsYesterday && (live.ev.getAttribute('style')||'').indexOf('--sleep')>-1){ pick=live; }
-    if(!pick){
-      for(var q=0;q<all.length;q++){
-        var itq=all[q];
-        if((itq.ev.getAttribute('style')||'').indexOf('--sleep')<0) continue;
-        var tcq=itq.ev.querySelector('.tc');
-        if(tcq && tcq.textContent==='התארגנות') continue;
-        var rel = itq.date>todayStr || (itq.date===todayStr && (itq.e<itq.s || cur<itq.e));
-        if(rel){ pick=itq; break; }
-      }
-    }
-    if(pick){
-      var lbl = (live===pick) ? 'עכשיו' : (pick.date===todayStr ? 'היום' : pick.dn);
-      var nm=(pick.ev.querySelector('.tc')||{textContent:'שינה'}).textContent;
-      st.innerHTML=lbl+' · '+nm+' <span class="t">'+pick.tEl.textContent+'</span>';
-    }
-  }
-})();
-</script>
-<script>
-(function(){
-  var CATS=[['--shift','משמרת','var(--shift)'],['--sleep','שינה','var(--sleep)'],['--workout','אימון','var(--workout)'],['--self','זמן אישי','var(--self)'],['--meal','ארוחה','var(--meal)']];
-  function mins(s){var p=s.split(':');return (+p[0])*60+(+p[1])}
-  function h(x){var v=x/60; return (Math.round(v*10)/10)+''}
-  function pad(n){return (n<10?'0':'')+n}
-  var now=new Date();
-  var todayStr=now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate());
-  var weeks=[];
-  var secs=document.querySelectorAll('section.week');
-  for(var i=0;i<secs.length;i++){
-    var sec=secs[i]; if(!sec.querySelector('.days')) continue;
-    var name=sec.querySelector('h2').textContent.split('·')[0].trim();
-    var totals={}, prop={}; CATS.forEach(function(c){totals[c[0]]=0;prop[c[0]]=0});
-    var nights=0;
-    var ds=[].slice.call(sec.querySelectorAll('.day[data-date]')).map(function(d){return d.getAttribute('data-date')}).sort();
-    [].slice.call(sec.querySelectorAll('.ev')).forEach(function(ev){
-      var st=ev.getAttribute('style')||'';
-      var cat=null; CATS.forEach(function(c){ if(st.indexOf(c[0])>-1) cat=c[0]; });
-      if(!cat) return;
-      var tEl=ev.querySelector('.t'); if(!tEl) return;
-      var m=tEl.textContent.match(/(\d{1,2}:\d{2})–(\d{1,2}:\d{2})/); if(!m) return;
-      var s=mins(m[1]),e=mins(m[2]); var d=e>s? e-s : e+1440-s;
-      if(cat==='--shift' && (e>s ? s<480 : e>0)) nights++;
-      if(ev.classList.contains('proposed')) prop[cat]+=d; else totals[cat]+=d;
-    });
-    weeks.push({name:name,totals:totals,prop:prop,nights:nights,from:ds[0]||'',to:ds[ds.length-1]||''});
-  }
-  function catAll(w,c){return (w.totals[c]||0)+(w.prop[c]||0)}
-  var cwi=0;
-  for(var k=0;k<weeks.length;k++){ if(weeks[k].from<=todayStr && todayStr<=weeks[k].to){cwi=k;break} if(todayStr>weeks[k].to) cwi=Math.min(k+1,weeks.length-1); }
-  var cw=weeks[cwi]||{totals:{},prop:{},nights:0,name:''};
-  var allNights=0, shiftAll=0;
-  weeks.forEach(function(w){allNights+=w.nights; shiftAll+=(w.totals['--shift']||0)});
-  var tl=document.getElementById('stat-tiles');
-  if(tl) tl.innerHTML=
-    '<div class="tile" data-week="'+cwi+'" style="--tc:var(--shift)"><div class="k">משמרות · השבוע ('+cw.name+')</div><div class="v">'+h(cw.totals['--shift']||0)+' שעות</div></div>'+
-    '<div class="tile" data-week="'+cwi+'" style="--tc:var(--self)"><div class="k">זמן אישי · השבוע</div><div class="v">'+h(catAll(cw,'--self'))+' שעות</div></div>'+
-    '<div class="tile" data-week="'+cwi+'" style="--tc:var(--workout)"><div class="k">אימונים · השבוע</div><div class="v">'+h(catAll(cw,'--workout'))+' שעות</div></div>'+
-    '<div class="tile" data-week="'+cwi+'" style="--tc:var(--sleep)"><div class="k">משמרות לילה · השבוע</div><div class="v">'+cw.nights+'</div></div>';
-  var bars=document.getElementById('stat-bars');
-  var max=0;
-  weeks.forEach(function(w){var t=0;CATS.forEach(function(c){t+=catAll(w,c[0])});w.total=t;if(t>max)max=t});
-  if(bars && max>0){
-    var html='';
-    weeks.forEach(function(w,wi){
-      html+='<div class="bar-row" data-week="'+wi+'"><span class="bl">'+w.name+(wi===cwi?' ⭐':'')+'</span><div class="bar-track">';
-      CATS.forEach(function(c){
-        var v=w.totals[c[0]], p=w.prop[c[0]];
-        if(v>0) html+='<div class="bar-seg" style="width:'+(v/max*100)+'%;background:'+c[2]+'"></div>';
-        if(p>0) html+='<div class="bar-seg prop" style="width:'+(p/max*100)+'%;background:'+c[2]+'"></div>';
+  function copy(){ var o = {}; for (var k in base) o[k] = base[k]; return o; }
+  // iframe ראשי (עובד גם במצב אפליקציה של iOS); אם נכשל — נופלים ל-JSONP (ספארי רגיל)
+  return frameCall(copy()).catch(function(){ return jsonp(copy()); });
+}
+
+/* ================= מצב ורינדור ================= */
+var state = { monthKey:null, data:null, view:'v-home', addType:'הוצאה', addCat:null, fxType:'הוצאה', trendSel:5 };
+
+function loadMonth(key, force){
+  el('main').classList.add('loading');
+  return api('getData', key||'').then(function(d){
+    state.monthKey = d.monthKey;
+    state.data = d;
+    if (state.trendSel == null) state.trendSel = d.history.length-1;
+    renderAll();
+  }).catch(function(e){
+    toast('שגיאה בטעינה: ' + (e && e.message || e));
+  }).then(function(){ el('main').classList.remove('loading'); });
+}
+
+function renderAll(){
+  var d = state.data; if (!d) return;
+  el('monthLabel').textContent = monthLabel(d.monthKey);
+  renderHome(d); renderTx(d); renderFixed(d); renderTrend(d); renderAllTime(d); renderAddForm(d);
+}
+
+/* ---------- מאזן כולל ---------- */
+function renderAllTime(d){
+  var c = el('atCard'), a = d.allTime;
+  if (!a) { c.style.display = 'none'; return; }
+  c.style.display = 'block';
+  el('at-title').textContent = 'המאזן הכולל מאז ' + monthLabel(a.firstKey);
+  el('at-net').textContent = (a.net > 0 ? '+' : '') + nis(a.net);
+  el('at-net').style.color = a.net < 0 ? 'var(--bad-text)' : 'var(--good-text)';
+  el('at-inc').textContent = nis(a.inc);
+  el('at-exp').textContent = nis(a.exp);
+  el('at-sub').textContent = (a.months === 1 ? 'חודש אחד' : a.months + ' חודשים') + ' · כולל הקבועות בכל חודש';
+}
+
+/* ---------- ראשי ---------- */
+function renderHome(d){
+  var t = d.totals;
+  el('h-net').textContent = nis(t.net);
+  el('h-net').style.color = t.net < 0 ? 'var(--bad-text)' : 'var(--ink)';
+  el('h-inc').textContent = nis(t.inc);
+  el('h-exp').textContent = nis(t.exp);
+  el('h-inc-sub').textContent = t.fixedInc ? 'מתוכן קבועות: ' + nis(t.fixedInc) : '';
+  el('h-exp-sub').textContent = t.fixedExp ? 'מתוכן קבועות: ' + nis(t.fixedExp) : '';
+
+  // דלתא מול חודש קודם (לפי היסטוריה)
+  var h = d.history, cur = h[h.length-1], prev = h[h.length-2];
+  var dEl = el('h-delta');
+  if (prev && (prev.inc || prev.exp)) {
+    var diff = cur.net - prev.net;
+    var cls = diff >= 0 ? 'up' : 'down';
+    var arrow = diff >= 0 ? '▲' : '▼';
+    dEl.innerHTML = 'לעומת ' + esc(shortMonth(prev.key)) + ': <b class="'+cls+'">' + arrow + ' ' + mspan(nis(Math.abs(diff))) + '</b>';
+  } else dEl.textContent = '';
+
+  // קטגוריות — לחיצה פותחת את פירוט הקניות שבקטגוריה
+  var wrap = el('h-cats'); wrap.innerHTML = '';
+  if (!d.catTotals.length) {
+    wrap.innerHTML = '<div class="empty">עוד אין הוצאות החודש.<br>שלחו לקלוד צילום של קבלה — או הוסיפו כאן עם ➕</div>';
+  } else {
+    var max = d.catTotals[0].sum || 1;
+    // עסקאות החודש לפי קטגוריה + קבועות פעילות לפי קטגוריה
+    var txByCat = {}, fxByCat = {};
+    d.tx.filter(function(t){ return t.type === 'הוצאה'; })
+        .forEach(function(t){ (txByCat[t.category] = txByCat[t.category] || []).push(t); });
+    (d.fixed || []).filter(function(f){ return f.active && f.type === 'הוצאה'; })
+        .forEach(function(f){ (fxByCat[f.category] = fxByCat[f.category] || []).push(f); });
+
+    d.catTotals.forEach(function(c){
+      var cell = document.createElement('div'); cell.className = 'catcell';
+      var row = document.createElement('div'); row.className = 'catrow';
+      row.innerHTML =
+        '<div class="nm">' + catIcon(c.cat) + ' ' + esc(c.cat) + '</div>' +
+        '<div class="bar"><i style="width:' + Math.max(3, Math.round(c.sum/max*100)) + '%"></i></div>' +
+        '<div class="vl">' + esc(nis(c.sum)) + '</div>' +
+        '<div class="chev">▾</div>';
+
+      var exp = document.createElement('div'); exp.className = 'catexp';
+      var lines = [];
+      (fxByCat[c.cat] || []).forEach(function(f){
+        lines.push('<div class="exprow"><span class="expnm">🔁 ' + esc(f.name) +
+          ' <span class="expd">· קבוע</span></span><span class="expamt">' + esc(nisC(f.amount)) + '</span></div>');
       });
-      html+='</div><span class="bt">'+h(w.total)+' ש׳</span></div>';
-    });
-    html+='<div id="stat-note">'+allNights+' משמרות לילה על הלוח · סה"כ '+h(shiftAll)+' שעות משמרת · לילה = כל משמרת שנוגעת ב-00:00–08:00 · מקווקו = אופציונלי · ⭐ = השבוע הנוכחי</div>';
-    bars.innerHTML=html;
-  }
-  var tip=document.createElement('div'); tip.id='viz-tip'; document.body.appendChild(tip);
-  function tipHtml(wi){
-    var w=weeks[wi]; if(!w) return '';
-    var out='<b>'+w.name+' · סה"כ '+h(w.total)+' שעות</b><br>';
-    CATS.forEach(function(c){
-      var v=w.totals[c[0]], p=w.prop[c[0]];
-      if(v>0||p>0){
-        out+='<span class="tip-dot" style="background:'+c[2]+'"></span>'+c[1]+' · '+h(v+p)+' ש׳';
-        if(p>0) out+=' <span style="opacity:.75">(מזה '+h(p)+' אופציונלי)</span>';
-        out+='<br>';
-      }
-    });
-    if(w.nights>0) out+='<span style="opacity:.75">'+w.nights+' משמרות לילה</span>';
-    return out;
-  }
-  function show(e,wi){
-    tip.innerHTML=tipHtml(wi); tip.style.display='block';
-    var x=e.clientX, y=e.clientY;
-    var r=tip.getBoundingClientRect();
-    var left=Math.min(Math.max(8,x-r.width/2), window.innerWidth-r.width-8);
-    var top=y+18; if(top+r.height>window.innerHeight-8) top=y-r.height-14;
-    tip.style.left=left+'px'; tip.style.top=top+'px';
-  }
-  var tipOwner=null;
-  function bind(el){
-    var wi=+el.getAttribute('data-week');
-    el.addEventListener('mousemove',function(e){show(e,wi)});
-    el.addEventListener('mouseleave',function(){tip.style.display='none';tipOwner=null});
-    el.addEventListener('click',function(e){
-      e.stopPropagation();
-      if(tip.style.display==='block' && tipOwner===el){tip.style.display='none';tipOwner=null}
-      else {show(e,wi);tipOwner=el}
+      (txByCat[c.cat] || []).slice().sort(function(a,b){ return b.amount - a.amount; }).forEach(function(t){
+        var day = t.date.slice(8,10) + '.' + t.date.slice(5,7);
+        lines.push('<div class="exprow"><span class="expnm">' + esc(t.business || c.cat) +
+          ' <span class="expd">· ' + day + (t.note ? ' · ' + esc(t.note) : '') + '</span></span>' +
+          '<span class="expamt">' + esc(nisC(t.amount)) + '</span></div>');
+      });
+      exp.innerHTML = lines.length ? lines.join('') : '<div class="catexp-empty">אין פירוט לקטגוריה הזו החודש.</div>';
+
+      row.addEventListener('click', function(){
+        var isOpen = cell.classList.contains('open');
+        var opened = wrap.querySelectorAll('.catcell.open');
+        for (var i = 0; i < opened.length; i++) opened[i].classList.remove('open');
+        if (!isOpen) cell.classList.add('open');
+      });
+      cell.appendChild(row); cell.appendChild(exp);
+      wrap.appendChild(cell);
     });
   }
-  [].slice.call(document.querySelectorAll('.bar-row[data-week]')).forEach(bind);
-  document.addEventListener('click',function(){tip.style.display='none';tipOwner=null});
-})();
-</script>
-<script>
-(function(){
-  function store(k,v){ try{ if(v) localStorage.setItem(k,v); else localStorage.removeItem(k); }catch(e){} }
-  function fetchNote(k){ try{ return localStorage.getItem(k)||''; }catch(e){ return ''; } }
-  var evs=[].slice.call(document.querySelectorAll('.ev'));
-  evs.forEach(function(ev){
-    if(ev.dataset.wired) return; ev.dataset.wired='1';
-    var day=ev.closest('.day');
-    var d=day?day.getAttribute('data-date'):'x';
-    var tc=ev.querySelector('.tc'); var t=ev.querySelector('.t');
-    var key='luznote:'+d+'|'+(tc?tc.textContent:'')+'|'+(t?t.textContent:'');
-    var details=ev.getAttribute('title')||'';
-    var more=document.createElement('div'); more.className='ev-more';
-    if(details){ var dd=document.createElement('div'); dd.className='ev-details'; dd.textContent='ℹ️ '+details; more.appendChild(dd); }
-    var ta=document.createElement('textarea'); ta.className='ev-note'; ta.rows=2; ta.placeholder='הוסף הערה…';
-    ta.value=fetchNote(key);
-    ta.addEventListener('click',function(e){e.stopPropagation();});
-    ta.addEventListener('input',function(){ store(key, ta.value.trim()); ev.classList.toggle('has-note', !!ta.value.trim()); });
-    more.appendChild(ta);
-    var hint=document.createElement('div'); hint.className='ev-hint'; hint.textContent='נשמר אוטומטית · הערה נשמרת אצלך בטלפון';
-    more.appendChild(hint);
-    ev.appendChild(more);
-    if(ta.value.trim()) ev.classList.add('has-note');
-    ev.addEventListener('click',function(e){ if(e.target.closest('.ev-note')) return; ev.classList.toggle('open'); });
+
+  // אחרונות
+  var rec = el('h-recent'); rec.innerHTML = '';
+  if (!d.tx.length) {
+    rec.innerHTML = '<div class="empty">אין עסקאות בחודש הזה עדיין.</div>';
+  } else {
+    d.tx.slice(0,6).forEach(function(t){ rec.appendChild(txRow(t, false)); });
+  }
+}
+
+function txRow(t, withDelete){
+  var row = document.createElement('div'); row.className = 'txrow';
+  var isInc = t.type === 'הכנסה';
+  var day = t.date.slice(8,10) + '.' + t.date.slice(5,7);
+  row.innerHTML =
+    '<div class="ic">' + catIcon(t.category) + '</div>' +
+    '<div class="mid">' +
+      '<div class="b">' + esc(t.business || t.category) + '</div>' +
+      '<div class="c">' + esc(t.category) + ' · ' + day + (t.note ? ' · ' + esc(t.note) : '') + '</div>' +
+    '</div>' +
+    '<div class="amt ' + (isInc?'in':'') + '">' + (isInc?'+':'−') + esc(nisC(t.amount)) + '</div>' +
+    (withDelete ? '<button class="del" title="מחיקה">🗑</button>' : '');
+  if (withDelete) {
+    row.querySelector('.del').addEventListener('click', function(){
+      if (!confirm('למחוק את "' + (t.business||t.category) + '" על ' + nisC(t.amount) + '?')) return;
+      el('main').classList.add('loading');
+      api('deleteTx', t.id).then(function(){ toast('נמחק'); return loadMonth(state.monthKey); })
+        .catch(function(){ toast('שגיאה במחיקה'); el('main').classList.remove('loading'); });
+    });
+  }
+  return row;
+}
+
+/* ---------- עסקאות ---------- */
+function renderTx(d){
+  var wrap = el('txlist'); wrap.innerHTML = '';
+  if (!d.tx.length) {
+    wrap.innerHTML = '<div class="empty">אין עסקאות ב' + esc(monthLabel(d.monthKey)) + '.<br>אפשר לדפדף לחודש אחר עם החיצים למעלה.</div>';
+    return;
+  }
+  var byDay = {};
+  d.tx.forEach(function(t){ (byDay[t.date] = byDay[t.date] || []).push(t); });
+  Object.keys(byDay).sort().reverse().forEach(function(date){
+    var lbl = document.createElement('div'); lbl.className = 'daylbl';
+    var dd = new Date(date + 'T12:00:00');
+    var dayName = ['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'][dd.getDay()];
+    lbl.textContent = 'יום ' + dayName + ', ' + date.slice(8,10) + '.' + date.slice(5,7);
+    wrap.appendChild(lbl);
+    byDay[date].forEach(function(t){ wrap.appendChild(txRow(t, true)); });
   });
+}
+
+/* ---------- קבועות ---------- */
+function renderFixed(d){
+  el('fx-inc').textContent = nis(d.totals.fixedInc);
+  el('fx-exp').textContent = nis(d.totals.fixedExp);
+  ['inc','exp'].forEach(function(kind){
+    var listEl = el('fx-list-' + kind); listEl.innerHTML = '';
+    var items = d.fixed.filter(function(f){ return (f.type==='הכנסה') === (kind==='inc'); });
+    if (!items.length) {
+      listEl.innerHTML = '<div class="empty" style="padding:12px">אין עדיין. אפשר להוסיף למטה 👇</div>';
+      return;
+    }
+    items.forEach(function(f){
+      var row = document.createElement('div'); row.className = 'fixrow' + (f.active?'':' off');
+      row.innerHTML =
+        '<div class="mid">' +
+          '<div class="b">' + esc(f.name) + '</div>' +
+          '<div class="c">' + esc(f.category) + ' · יום ' + f.day + ' בחודש</div>' +
+        '</div>' +
+        '<div class="amt">' + esc(nis(f.amount)) + '</div>' +
+        '<label class="sw"><input type="checkbox" ' + (f.active?'checked':'') + '><i></i></label>' +
+        '<button class="del" style="border:0;background:none;color:var(--muted);font-size:16px;cursor:pointer">🗑</button>';
+      row.querySelector('.sw input').addEventListener('change', function(){
+        api('toggleFixed', f.id).then(function(){ return loadMonth(state.monthKey); });
+      });
+      row.querySelector('.del').addEventListener('click', function(){
+        if (!confirm('למחוק את הקבועה "' + f.name + '"?')) return;
+        api('deleteFixed', f.id).then(function(){ toast('נמחק'); return loadMonth(state.monthKey); });
+      });
+      listEl.appendChild(row);
+    });
+  });
+  // select קטגוריות לטופס קבועה
+  fillFixedCatSelect(d);
+}
+
+function fillFixedCatSelect(d){
+  var sel = el('fx_cat'); sel.innerHTML = '';
+  d.cats.filter(function(c){ return c.type === state.fxType; }).forEach(function(c){
+    var o = document.createElement('option'); o.value = c.name; o.textContent = c.name;
+    sel.appendChild(o);
+  });
+}
+
+/* ---------- טופס הוספה ---------- */
+function renderAddForm(d){
+  if (!el('f_date').value) el('f_date').value = d.today;
+  var dl = el('bizlist'); dl.innerHTML = '';
+  d.businesses.forEach(function(b){
+    var o = document.createElement('option'); o.value = b; dl.appendChild(o);
+  });
+  renderCatChips(d);
+}
+function renderCatChips(d){
+  var wrap = el('f_cats'); wrap.innerHTML = '';
+  var list = d.cats.filter(function(c){ return c.type === state.addType; });
+  if (!state.addCat || !list.some(function(c){ return c.name === state.addCat; })) {
+    state.addCat = list.length ? list[0].name : 'אחר';
+  }
+  list.forEach(function(c){
+    var b = document.createElement('button'); b.type = 'button';
+    b.className = 'chip' + (c.name === state.addCat ? ' on' : '');
+    b.textContent = catIcon(c.name) + ' ' + c.name;
+    b.addEventListener('click', function(){ state.addCat = c.name; renderCatChips(d); });
+    wrap.appendChild(b);
+  });
+}
+
+/* ---------- מגמות ---------- */
+function renderTrend(d){
+  var svg = el('trendSvg');
+  var W = svg.clientWidth || 328, H = 216;
+  var padT = 10, padB = 24, padL = 8, padR = 40; // padR = רצועת צירי Y מימין (ltr => right)
+  var plotW = W - padL - padR, plotH = H - padT - padB;
+  var groups = d.history;
+  var maxV = 0;
+  groups.forEach(function(g){ maxV = Math.max(maxV, g.inc, g.exp); });
+  if (!maxV) maxV = 1000;
+  // עיגול לתקרה נעימה
+  var pow = Math.pow(10, String(Math.ceil(maxV)).length - 1);
+  var niceMax = Math.ceil(maxV / pow) * pow;
+  if (niceMax / maxV > 1.6) niceMax = Math.ceil(maxV / (pow/2)) * (pow/2);
+
+  var gw = plotW / groups.length;
+  var barW = Math.min(16, Math.floor((gw - 14) / 2));
+  var gap = 2;
+
+  var ns = 'http://www.w3.org/2000/svg';
+  svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+  svg.innerHTML = '';
+
+  function y(v){ return padT + plotH * (1 - v / niceMax); }
+  function roundedTopBar(x, v, fill, dim){
+    var h = Math.max(v > 0 ? 3 : 0, plotH * (v / niceMax));
+    var yy = padT + plotH - h;
+    var r = Math.min(4, barW/2, h);
+    var p = document.createElementNS(ns, 'path');
+    p.setAttribute('d',
+      'M' + x + ' ' + (padT + plotH) +
+      ' L' + x + ' ' + (yy + r) +
+      ' Q' + x + ' ' + yy + ' ' + (x + r) + ' ' + yy +
+      ' L' + (x + barW - r) + ' ' + yy +
+      ' Q' + (x + barW) + ' ' + yy + ' ' + (x + barW) + ' ' + (yy + r) +
+      ' L' + (x + barW) + ' ' + (padT + plotH) + ' Z');
+    p.setAttribute('fill', fill);
+    if (dim) p.setAttribute('opacity', '0.45');
+    svg.appendChild(p);
+  }
+
+  // קווי רשת + תוויות ציר (בצד ימין — כיוון קריאה עברי)
+  for (var i = 0; i <= 2; i++) {
+    var v = niceMax * i / 2;
+    var ly = y(v);
+    var line = document.createElementNS(ns, 'line');
+    line.setAttribute('x1', padL); line.setAttribute('x2', padL + plotW);
+    line.setAttribute('y1', ly); line.setAttribute('y2', ly);
+    line.setAttribute('stroke', i === 0 ? 'var(--baseline)' : 'var(--grid)');
+    line.setAttribute('stroke-width', '1');
+    svg.appendChild(line);
+    if (i > 0) {
+      var tx = document.createElementNS(ns, 'text');
+      tx.setAttribute('x', W - 4); tx.setAttribute('y', ly + 4);
+      tx.setAttribute('text-anchor', 'end');
+      tx.setAttribute('font-size', '10'); tx.setAttribute('fill', 'var(--muted)');
+      tx.textContent = compact(v);
+      svg.appendChild(tx);
+    }
+  }
+
+  var inkInc = getComputedStyle(document.documentElement).getPropertyValue('--inc').trim() || '#3d8b3d';
+  var inkExp = getComputedStyle(document.documentElement).getPropertyValue('--exp').trim() || '#4a7ab5';
+
+  groups.forEach(function(g, gi){
+    var cx = padL + gw * gi + gw / 2;
+    var x0 = cx - barW - gap/2, x1 = cx + gap/2;
+    var dim = gi !== state.trendSel;
+    roundedTopBar(x0, g.inc, inkInc, dim);
+    roundedTopBar(x1, g.exp, inkExp, dim);
+
+    // תווית חודש
+    var tx = document.createElementNS(ns, 'text');
+    tx.setAttribute('x', cx); tx.setAttribute('y', H - 8);
+    tx.setAttribute('text-anchor', 'middle');
+    tx.setAttribute('font-size', '10.5');
+    tx.setAttribute('fill', gi === state.trendSel ? 'var(--ink)' : 'var(--muted)');
+    if (gi === state.trendSel) tx.setAttribute('font-weight', '700');
+    tx.textContent = shortMonth(g.key);
+    svg.appendChild(tx);
+
+    // אזור מגע רחב לכל קבוצה
+    var hit = document.createElementNS(ns, 'rect');
+    hit.setAttribute('x', padL + gw * gi); hit.setAttribute('y', 0);
+    hit.setAttribute('width', gw); hit.setAttribute('height', H);
+    hit.setAttribute('fill', 'transparent');
+    hit.style.cursor = 'pointer';
+    hit.addEventListener('click', function(){
+      state.trendSel = gi;
+      renderTrend(d);
+      showTrendTT(d, gi, padL + gw * gi + gw/2, W);
+    });
+    svg.appendChild(hit);
+  });
+
+  // כיתוב לחודש הנבחר
+  var sel = groups[state.trendSel] || groups[groups.length-1];
+  el('trendCap').innerHTML = '<b>' + esc(shortMonth(sel.key)) + '</b>: נכנס <b>' + mspan(nis(sel.inc)) +
+    '</b> · יוצא <b>' + mspan(nis(sel.exp)) + '</b> · נטו <b>' + mspan(nis(sel.net)) + '</b>';
+
+  // טבלת נתונים (תצוגת הנגישות)
+  var tbl = el('trendTable');
+  var rows = '<tr><th>חודש</th><th>נכנס</th><th>יוצא</th><th>נטו</th></tr>';
+  groups.slice().reverse().forEach(function(g){
+    rows += '<tr><td>' + esc(shortMonth(g.key)) + '</td><td>' + esc(nis(g.inc)) + '</td><td>' +
+      esc(nis(g.exp)) + '</td><td dir="ltr">' + esc(nis(g.net)) + '</td></tr>';
+  });
+  tbl.innerHTML = rows;
+}
+
+function showTrendTT(d, gi, cx, W){
+  var g = d.history[gi];
+  var tt = el('trendTT');
+  tt.innerHTML = esc(monthLabel(g.key)) + '<br>נכנס: <b>' + mspan(nis(g.inc)) + '</b><br>יוצא: <b>' +
+    mspan(nis(g.exp)) + '</b><br>נטו: <b>' + mspan(nis(g.net)) + '</b>';
+  tt.style.display = 'block';
+  var ttW = 130;
+  var x = Math.min(Math.max(cx - ttW/2, 4), W - ttW - 4);
+  tt.style.left = x + 'px';
+  tt.style.top = '8px';
+  clearTimeout(tt._h); tt._h = setTimeout(function(){ tt.style.display = 'none'; }, 2600);
+}
+
+/* ================= אירועים ================= */
+document.querySelectorAll('nav button').forEach(function(b){
+  b.addEventListener('click', function(){
+    var v = b.getAttribute('data-v');
+    state.view = v;
+    document.querySelectorAll('.view').forEach(function(s){ s.classList.toggle('on', s.id === v); });
+    document.querySelectorAll('nav button').forEach(function(x){ x.classList.toggle('on', x === b); });
+    window.scrollTo(0, 0);
+  });
+});
+el('goAllTx').addEventListener('click', function(){
+  document.querySelector('nav button[data-v="v-tx"]').click();
+});
+el('prevM').addEventListener('click', function(){ state.trendSel = 5; loadMonth(addMonths(state.monthKey, -1)); });
+el('nextM').addEventListener('click', function(){ state.trendSel = 5; loadMonth(addMonths(state.monthKey, +1)); });
+el('btnRefresh').addEventListener('click', function(){
+  el('btnRefresh').textContent = '…';
+  api('importNow').then(function(r){
+    el('btnRefresh').textContent = '⟳';
+    if (r && r.added) toast('נקלטו ' + r.added + ' עסקאות חדשות מקלוד 🎉');
+    else toast('אין עדכונים חדשים');
+    return loadMonth(state.monthKey);
+  }).catch(function(){ el('btnRefresh').textContent = '⟳'; toast('שגיאה במשיכה'); });
+});
+
+// טופס הוספה
+el('f_type').querySelectorAll('button').forEach(function(b){
+  b.addEventListener('click', function(){
+    state.addType = b.getAttribute('data-t');
+    el('f_type').querySelectorAll('button').forEach(function(x){ x.classList.toggle('on', x === b); });
+    renderCatChips(state.data);
+  });
+});
+el('fx_type').querySelectorAll('button').forEach(function(b){
+  b.addEventListener('click', function(){
+    state.fxType = b.getAttribute('data-t');
+    el('fx_type').querySelectorAll('button').forEach(function(x){ x.classList.toggle('on', x === b); });
+    fillFixedCatSelect(state.data);
+  });
+});
+el('f_save').addEventListener('click', function(){
+  var amount = parseFloat(String(el('f_amount').value).replace(',', '.'));
+  if (!amount || amount <= 0) { toast('צריך להזין סכום'); el('f_amount').focus(); return; }
+  var o = {
+    amount: amount, type: state.addType, category: state.addCat,
+    business: el('f_business').value, date: el('f_date').value, note: el('f_note').value,
+    source: 'ידני'
+  };
+  el('f_save').disabled = true; el('f_save').textContent = 'שומר…';
+  api('addTx', o).then(function(){
+    el('f_save').disabled = false; el('f_save').textContent = 'שמירה';
+    el('f_amount').value = ''; el('f_business').value = ''; el('f_note').value = '';
+    toast('נשמר ✓');
+    document.querySelector('nav button[data-v="v-home"]').click();
+    return loadMonth(state.monthKey);
+  }).catch(function(){
+    el('f_save').disabled = false; el('f_save').textContent = 'שמירה';
+    toast('שגיאה בשמירה');
+  });
+});
+el('fx_save').addEventListener('click', function(){
+  var amount = parseFloat(String(el('fx_amount').value).replace(',', '.'));
+  var name = el('fx_name').value.trim();
+  if (!name) { toast('צריך שם לקבועה'); return; }
+  if (!amount || amount <= 0) { toast('צריך להזין סכום'); return; }
+  var o = { name: name, amount: amount, type: state.fxType, category: el('fx_cat').value, day: el('fx_day').value };
+  el('fx_save').disabled = true;
+  api('addFixed', o).then(function(){
+    el('fx_save').disabled = false;
+    el('fx_name').value = ''; el('fx_amount').value = '';
+    toast('הקבועה נוספה ✓');
+    return loadMonth(state.monthKey);
+  }).catch(function(){ el('fx_save').disabled = false; toast('שגיאה'); });
+});
+
+window.addEventListener('resize', function(){ if (state.data) renderTrend(state.data); });
+
+/* ================= נתוני דוגמה (תצוגה מקדימה בלבד — לא רץ בגרסה האמיתית) ================= */
+var MOCK_STATE = null;
+function mockInit(){
+  if (MOCK_STATE) return;
+  var d = new Date();
+  var mk = d.getFullYear() + '-' + ('0'+(d.getMonth()+1)).slice(-2);
+  MOCK_STATE = {
+    curKey: mk,
+    today: mk + '-' + ('0'+d.getDate()).slice(-2),
+    cats: [
+      {name:'מזון וסופר',type:'הוצאה'},{name:'אוכל בחוץ',type:'הוצאה'},{name:'תחבורה ודלק',type:'הוצאה'},
+      {name:'דיור',type:'הוצאה'},{name:'חשבונות ותקשורת',type:'הוצאה'},{name:'בריאות ופארם',type:'הוצאה'},
+      {name:'פנאי ובילויים',type:'הוצאה'},{name:'קניות',type:'הוצאה'},{name:'חינוך וילדים',type:'הוצאה'},
+      {name:'מנויי AI ונספחים',type:'הוצאה'},{name:'מתנות ותרומות',type:'הוצאה'},{name:'העברות',type:'הוצאה'},
+      {name:'קנטינה ובסיס',type:'הוצאה'},
+      {name:'אחר',type:'הוצאה'},{name:'משכורת',type:'הכנסה'},{name:'עסק ופרילנס',type:'הכנסה'},
+      {name:'העברות ומתנות',type:'הכנסה'},{name:'אחר',type:'הכנסה'}
+    ],
+    tx: [
+      {id:'1',date:mk+'-17',amount:214.6,type:'הוצאה',category:'מזון וסופר',business:'יוחננוף',note:'',source:'צילום',created:'8'},
+      {id:'2',date:mk+'-17',amount:58,type:'הוצאה',category:'אוכל בחוץ',business:'וולט · המבורגר',note:'',source:'צילום',created:'7'},
+      {id:'3',date:mk+'-16',amount:250,type:'הוצאה',category:'תחבורה ודלק',business:'פז yellow',note:'',source:'צילום',created:'6'},
+      {id:'4',date:mk+'-15',amount:1200,type:'הכנסה',category:'עסק ופרילנס',business:'פרויקט צד',note:'',source:'ידני',created:'5'},
+      {id:'5',date:mk+'-14',amount:129.9,type:'הוצאה',category:'מנויי AI ונספחים',business:'קלוד + Hetzner',note:'',source:'דוח',created:'4'},
+      {id:'6',date:mk+'-12',amount:390,type:'הוצאה',category:'קניות',business:'קרביץ · תשלום 1/3',note:'',source:'דוח',created:'3'},
+      {id:'7',date:mk+'-10',amount:95.5,type:'הוצאה',category:'בריאות ופארם',business:'סופר-פארם',note:'',source:'צילום',created:'2'},
+      {id:'8',date:mk+'-08',amount:462.3,type:'הוצאה',category:'מזון וסופר',business:'שופרסל',note:'קנייה שבועית',source:'דוח',created:'1'}
+    ],
+    fixed: [
+      {id:'f1',name:'משכורת',amount:12500,type:'הכנסה',category:'משכורת',day:10,active:true,created:''},
+      {id:'f2',name:'שכר דירה',amount:4200,type:'הוצאה',category:'דיור',day:1,active:true,created:''},
+      {id:'f3',name:'ארנונה',amount:380,type:'הוצאה',category:'חשבונות ותקשורת',day:5,active:true,created:''},
+      {id:'f4',name:'חדר כושר',amount:149,type:'הוצאה',category:'פנאי ובילויים',day:3,active:false,created:''}
+    ]
+  };
+}
+function mockApi(fn, args){
+  mockInit();
+  var s = MOCK_STATE;
+  if (fn === 'getData') return Promise.resolve(mockGetData(args[0] || s.curKey));
+  if (fn === 'addTx') {
+    var o = args[0] || {};
+    s.tx.push({ id:'m'+(s.tx.length+1)+Math.random(), date:(o.date || s.today),
+      amount:Math.abs(parseFloat(o.amount)||0), type:o.type==='הכנסה'?'הכנסה':'הוצאה',
+      category:o.category||'אחר', business:String(o.business||'').trim(), note:String(o.note||''),
+      source:'ידני', created:String(Date.now()) });
+    return Promise.resolve({ok:true});
+  }
+  if (fn === 'deleteTx') { s.tx = s.tx.filter(function(t){ return t.id !== args[0]; }); return Promise.resolve({ok:true}); }
+  if (fn === 'addFixed') {
+    var f = args[0] || {};
+    s.fixed.push({ id:'mf'+Math.random(), name:String(f.name||'ללא שם'), amount:Math.abs(parseFloat(f.amount)||0),
+      type:f.type==='הכנסה'?'הכנסה':'הוצאה', category:f.category||'אחר',
+      day:Math.min(Math.max(parseInt(f.day,10)||1,1),31), active:true, created:'' });
+    return Promise.resolve({ok:true});
+  }
+  if (fn === 'toggleFixed') { s.fixed.forEach(function(f){ if (f.id===args[0]) f.active=!f.active; }); return Promise.resolve({ok:true}); }
+  if (fn === 'deleteFixed') { s.fixed = s.fixed.filter(function(f){ return f.id !== args[0]; }); return Promise.resolve({ok:true}); }
+  if (fn === 'importNow') return Promise.resolve({added:0, skippedDup:0, skippedFixed:0});
+  return Promise.resolve({ok:true});
+}
+function mockGetData(key){
+  var s = MOCK_STATE;
+  var monthTx = s.tx.filter(function(t){ return t.date.slice(0,7) === key; })
+    .sort(function(a,b){ return a.date < b.date ? 1 : a.date > b.date ? -1 : (a.created < b.created ? 1 : -1); });
+  var activeFixed = s.fixed.filter(function(f){ return f.active; });
+  function sumBy(list, type){ return list.filter(function(x){ return x.type===type; }).reduce(function(a,x){ return a+x.amount; }, 0); }
+  var fixedInc = sumBy(activeFixed,'הכנסה'), fixedExp = sumBy(activeFixed,'הוצאה');
+  var txInc = sumBy(monthTx,'הכנסה'), txExp = sumBy(monthTx,'הוצאה');
+  var byCat = {};
+  monthTx.forEach(function(t){ if (t.type==='הוצאה') byCat[t.category]=(byCat[t.category]||0)+t.amount; });
+  activeFixed.forEach(function(f){ if (f.type==='הוצאה') byCat[f.category]=(byCat[f.category]||0)+f.amount; });
+  var catTotals = Object.keys(byCat).map(function(k){ return {cat:k, sum:Math.round(byCat[k]*100)/100}; })
+    .sort(function(a,b){ return b.sum - a.sum; });
+  var hist = [];
+  for (var i=5; i>=0; i--){
+    var k2 = addMonths(key, -i);
+    var mtx = s.tx.filter(function(t){ return t.date.slice(0,7) === k2; });
+    var inc, exp;
+    if (mtx.length){ inc = sumBy(mtx,'הכנסה') + fixedInc; exp = sumBy(mtx,'הוצאה') + fixedExp; }
+    else { var seed = (Number(k2.slice(5,7))*713) % 2600; inc = 13700; exp = 9700 + seed; } // חודשי דמו
+    hist.push({key:k2, inc:Math.round(inc), exp:Math.round(exp*100)/100, net:Math.round((inc-exp)*100)/100});
+  }
+  var seen = {}, businesses = [];
+  s.tx.slice().reverse().forEach(function(t){
+    var b = String(t.business||'').trim();
+    if (b && !seen[b] && businesses.length < 25){ seen[b]=1; businesses.push(b); }
+  });
+  // מאזן כולל (דמו)
+  var allTime = null;
+  if (s.tx.length) {
+    var firstKey = s.tx.map(function(t){ return t.date.slice(0,7); }).sort()[0];
+    var fp = firstKey.split('-'), np = s.curKey.split('-');
+    var nMonths = Math.max(1, (Number(np[0])-Number(fp[0]))*12 + (Number(np[1])-Number(fp[1])) + 1);
+    var atInc = sumBy(s.tx,'הכנסה') + fixedInc*nMonths;
+    var atExp = sumBy(s.tx,'הוצאה') + fixedExp*nMonths;
+    allTime = { firstKey:firstKey, months:nMonths, inc:Math.round(atInc*100)/100,
+      exp:Math.round(atExp*100)/100, net:Math.round((atInc-atExp)*100)/100 };
+  }
+  return {
+    monthKey:key, todayKey:s.curKey, today:s.today,
+    totals:{ inc:Math.round((txInc+fixedInc)*100)/100, exp:Math.round((txExp+fixedExp)*100)/100,
+      net:Math.round((txInc+fixedInc-txExp-fixedExp)*100)/100,
+      txInc:txInc, txExp:txExp, fixedInc:fixedInc, fixedExp:fixedExp },
+    tx:monthTx, catTotals:catTotals, cats:s.cats, fixed:s.fixed, history:hist, allTime:allTime, businesses:businesses
+  };
+}
+if (IS_MOCK) el('mockBanner').style.display = 'block';
+
+/* ================= מסך חיבור / הגדרות ================= */
+function showSetup(isSettings){
+  var s = el('setup');
+  el('setupSub').textContent = isSettings ? 'הגדרות החיבור' : 'חיבור חד-פעמי לחשבון שלך';
+  el('setDisconnect').style.display = (isSettings && CFG) ? 'block' : 'none';
+  if (CFG){ el('setUrl').value = CFG.url || ''; el('setToken').value = CFG.token || ''; }
+  el('setMsg').textContent = ''; el('setMsg').className = 'setup-msg';
+  s.style.display = 'flex';
+}
+function hideSetup(){ el('setup').style.display = 'none'; }
+
+el('setConnect').addEventListener('click', function(){
+  var url = el('setUrl').value.trim();
+  var token = el('setToken').value.trim();
+  var msg = el('setMsg');
+  if (!/^https:\/\/script\.google\.com\/.*\/exec/.test(url)){
+    msg.className = 'setup-msg err'; msg.textContent = 'הכתובת צריכה להתחיל ב-https://script.google.com ולהסתיים ב-/exec'; return;
+  }
+  if (!token){ msg.className = 'setup-msg err'; msg.textContent = 'חסר קוד גישה'; return; }
+  saveCfg(url, token);
+  msg.className = 'setup-msg'; msg.textContent = 'בודק חיבור…';
+  el('setConnect').disabled = true;
+  api('ping').then(function(){
+    msg.className = 'setup-msg ok'; msg.textContent = 'מחובר! טוען נתונים…';
+    el('setConnect').disabled = false;
+    hideSetup(); state.trendSel = 5; loadMonth('');
+  }).catch(function(e){
+    el('setConnect').disabled = false; clearCfg();
+    msg.className = 'setup-msg err'; msg.textContent = 'החיבור נכשל: ' + (e && e.message || e);
+  });
+});
+el('setDisconnect').addEventListener('click', function(){
+  if (!confirm('לנתק את האפליקציה מהחשבון? תצטרך להזין שוב כתובת וקוד.')) return;
+  clearCfg(); el('setUrl').value=''; el('setToken').value=''; showSetup(false);
+});
+el('btnSettings').addEventListener('click', function(){ showSetup(true); });
+
+/* ================= התחלה ================= */
+(function init(){
+  // הגדרה אוטומטית דרך ה-hash:  #c=BASE64("url|token")
+  // לא מוחקים את ה-hash מהכתובת — כך שאם מוסיפים למסך הבית מהקישור הזה,
+  // האייקון "זוכר" את הקוד לבד בכל פתיחה, בלי להקליד שוב כלום.
+  var m = location.hash.match(/[#&]c=([^&]+)/);
+  if (m){
+    try { var parts = atob(decodeURIComponent(m[1])).split('|');
+      if (parts[0] && parts[1]) saveCfg(parts[0], parts[1]); } catch(e){}
+  }
+  if (!CFG && !DEMO){ showSetup(false); return; }
+  loadMonth('');
 })();
 </script>
 </body>
