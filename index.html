@@ -159,7 +159,7 @@
 
 <header class="top">
   <h1>הלוז של הבולדוג</h1>
-  <span class="sub">היום <b id="cur-date">—</b> · תוכן הסידור עודכן: <span id="content-ver">22.7 · נוספו קפק סגל 14:30 + מסדר 17:00 (מהלו״ז היחידתי · @כולם)</span> · מתוך "סידור בקרים"</span>
+  <span class="sub">היום <b id="cur-date">—</b> · תוכן הסידור עודכן: <span id="content-ver">22.7 · קפק סגל 14:30 + מסדר סמאוג 16:15–18:00 (@כולם)</span> · מתוך "סידור בקרים"</span>
 </header>
 
 <div class="edit-tip">💡 טאץ' על כל בלוק פותח אותו — שם אפשר לכתוב הערה (נשמרת אצלך בטלפון) ולראות פרטים נוספים.</div>
@@ -243,8 +243,8 @@
       <div class="ev" style="--c:var(--sleep)"><span class="tc">התאוששות</span><span class="t">09:30–13:00</span></div>
       <div class="ev" style="--c:var(--self)"><span class="tc">זמן אישי</span><span class="t">13:00–14:30</span></div>
       <div class="ev" style="--c:var(--hearing)"><span class="tc">קפק</span><span class="t">14:30–15:30</span><span class="l">קפק סגל · @כולם</span></div>
-      <div class="ev" style="--c:var(--self)"><span class="tc">זמן אישי</span><span class="t">15:30–17:00</span></div>
-      <div class="ev" style="--c:var(--hearing)" title="מסדר סמאוג — מגורי קבע"><span class="tc">מסדר</span><span class="t">17:00–18:00</span><span class="l">מסדר סמאוג · מגורי קבע · @כולם</span></div>
+      <div class="ev" style="--c:var(--self)"><span class="tc">זמן אישי</span><span class="t">15:30–16:15</span></div>
+      <div class="ev" style="--c:var(--hearing)" title="מסדר סמאוג — מגורי קבע · השעה עודכנה"><span class="tc">מסדר</span><span class="t">16:15–18:00</span><span class="l">מסדר סמאוג · מגורי קבע · @כולם</span></div>
       <div class="ev" style="--c:var(--self)"><span class="tc">זמן אישי</span><span class="t">18:00–22:00</span><span class="l">ערב פנוי</span></div></div>
     <div class="day" data-date="2026-07-23"><div class="dh"><span class="dn">חמישי</span><span class="dd">23.7</span></div>
       <div class="note">בבית — אפטר</div>
@@ -319,8 +319,8 @@
       <tr><td>22.7</td><td>רביעי</td><td dir="ltr">09:30–13:00</td><td><span class="dot" style="--c:var(--sleep)"></span>שינה — התאוששות</td><td class="st-in">ביומן ✓</td></tr>
       <tr><td>22.7</td><td>רביעי</td><td dir="ltr">13:00–14:30</td><td><span class="dot" style="--c:var(--self)"></span>זמן אישי</td><td class="st-in">ביומן ✓</td></tr>
       <tr><td>22.7</td><td>רביעי</td><td dir="ltr">14:30–15:30</td><td><span class="dot" style="--c:var(--hearing)"></span>דיון · קפק סגל</td><td class="st-in">ביומן ✓</td></tr>
-      <tr><td>22.7</td><td>רביעי</td><td dir="ltr">15:30–17:00</td><td><span class="dot" style="--c:var(--self)"></span>זמן אישי</td><td class="st-in">ביומן ✓</td></tr>
-      <tr><td>22.7</td><td>רביעי</td><td dir="ltr">17:00–18:00</td><td><span class="dot" style="--c:var(--hearing)"></span>דיון · מסדר סמאוג</td><td class="st-in">ביומן ✓</td></tr>
+      <tr><td>22.7</td><td>רביעי</td><td dir="ltr">15:30–16:15</td><td><span class="dot" style="--c:var(--self)"></span>זמן אישי</td><td class="st-in">ביומן ✓</td></tr>
+      <tr><td>22.7</td><td>רביעי</td><td dir="ltr">16:15–18:00</td><td><span class="dot" style="--c:var(--hearing)"></span>דיון · מסדר סמאוג</td><td class="st-in">ביומן ✓</td></tr>
       <tr><td>22.7</td><td>רביעי</td><td dir="ltr">18:00–22:00</td><td><span class="dot" style="--c:var(--self)"></span>זמן אישי · ערב פנוי</td><td class="st-in">ביומן ✓</td></tr>
       <tr><td>23.7–25.7</td><td>חמישי–שבת</td><td dir="ltr">בבית</td><td><span class="dot" style="--c:var(--after)"></span>אפטר — בבית</td><td class="st-in">ביומן ✓</td></tr>
       <tr><td>25.7</td><td>שבת</td><td dir="ltr">10:00–11:30</td><td><span class="dot" style="--c:var(--workout)"></span>אימון בבית</td><td class="st-prop">המלצה</td></tr>
@@ -558,6 +558,27 @@
     if(ta.value.trim()) ev.classList.add('has-note');
     ev.addEventListener('click',function(e){ if(e.target.closest('.ev-note')) return; ev.classList.toggle('open'); });
   });
+})();
+</script>
+<script>
+/* עדכון אוטומטי: בכל פתיחה בודק מול השרת אם יש גרסה חדשה יותר וטוען אותה — בטוח גם במצב לא־מקוון */
+(function(){
+  try{
+    if(!navigator.onLine) return;
+    var el=document.getElementById('content-ver');
+    var cur=el?el.textContent.trim():'';
+    fetch(location.pathname+'?_cb='+Date.now(),{cache:'no-store'})
+      .then(function(r){return r.ok?r.text():Promise.reject(0);})
+      .then(function(t){
+        var m=t.match(/id="content-ver">([^<]*)</);
+        var live=m?m[1].trim():'';
+        if(live && cur && live!==cur){
+          var u=new URL(location.href);
+          u.searchParams.set('_v',Date.now());
+          location.replace(u.href);
+        }
+      }).catch(function(){});
+  }catch(e){}
 })();
 </script>
 </body>
